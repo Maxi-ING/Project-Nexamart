@@ -2,6 +2,8 @@
 
 **Python · MySQL · Power BI · DAX**
 
+[Ver el caso de estudio en Notion](https://app.notion.com/p/3f3711ab612481f9a5b6fe8d50bfbdbd?pvs=204)
+
 Proyecto de análisis de datos de principio a fin: preparación de transacciones, modelado relacional, consultas SQL y un dashboard para comparar el desempeño de cuatro tiendas internacionales.
 
 > **Resultado:** una base con **757 registros**, consultas analíticas y **tres páginas de Power BI** que conectan ventas, productos, vendedores y devoluciones. Empresa y datos simulados con fines de portafolio; no representan resultados de una organización real.
