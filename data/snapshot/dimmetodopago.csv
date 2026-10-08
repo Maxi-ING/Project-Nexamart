@@ -1,0 +1,6 @@
+metodo_pago_id,nombre_metodo
+1,Cash
+2,Credit Card
+3,Debit Card
+4,Digital Wallet
+5,PayPal

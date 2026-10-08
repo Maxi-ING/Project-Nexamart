@@ -1,0 +1,48 @@
+// Expresiones originales extraídas del PBIX. No es un script de creación de modelo.
+
+// Tabla: Medidas
+Ventas Totales =
+SUM('nexamart factventas'[precio_total])
+
+// Tabla: Medidas
+Unidades Vendidas =
+SUM('nexamart factventas'[cantidad])
+
+// Tabla: Medidas
+Total Pedidos =
+DISTINCTCOUNT('nexamart factventas'[order_id])
+
+// Tabla: Medidas
+Ticket Promedio =
+DIVIDE([Ventas Totales], [Total Pedidos])
+
+// Tabla: Medidas
+Ventas Mes Anterior =
+CALCULATE([Ventas Totales], DATEADD(DimCalendario[Date], -1, MONTH))
+
+// Tabla: Medidas
+% Crecimiento MoM =
+DIVIDE([Ventas Totales] - [Ventas Mes Anterior], [Ventas Mes Anterior])
+
+// Tabla: Medidas
+Ventas YTD =
+TOTALYTD([Ventas Totales], DimCalendario[Date])
+
+// Tabla: Medidas
+Ranking Vendedor =
+RANKX(ALL('nexamart dimvendedor'[nombre_vendedor]), [Ventas Totales], , DESC)
+
+// Tabla: Medidas
+Total Devoluciones =
+CALCULATE([Total Pedidos], 'nexamart factventas'[es_devolucion] = TRUE())
+
+// Tabla: Medidas
+% Tasa Devolución =
+DIVIDE([Total Devoluciones], [Total Pedidos])
+
+// Tabla: Medidas
+Ranking Producto en Categoría =
+RANKX(
+    ALLEXCEPT('nexamart dimproducto', 'nexamart dimproducto'[categoria]),
+    [Ventas Totales], , DESC
+)

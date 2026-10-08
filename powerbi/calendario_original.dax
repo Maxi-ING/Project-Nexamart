@@ -1,0 +1,11 @@
+// Expresión original extraída del PBIX.
+DimCalendario =
+ADDCOLUMNS(
+    CALENDAR(DATE(2025,9,1), DATE(2026,8,31)),
+    "Año", YEAR([Date]),
+    "Mes Número", MONTH([Date]),
+    "Mes Nombre", FORMAT([Date], "MMMM"),
+    "Año-Mes", FORMAT([Date], "YYYY-MM"),
+    "Trimestre", "Q" & FORMAT([Date], "Q"),
+    "Día Semana", FORMAT([Date], "dddd")
+)

@@ -6,7 +6,7 @@
 
 Proyecto de análisis de datos de principio a fin: preparación de transacciones, modelado relacional, consultas SQL y un dashboard para comparar el desempeño de cuatro tiendas internacionales.
 
-> **Resultado:** una base con **757 registros**, consultas analíticas y **tres páginas de Power BI** que conectan ventas, productos, vendedores y devoluciones. Empresa y datos simulados con fines de portafolio; no representan resultados de una organización real.
+> **Resultado:** 757 registros, **11 medidas DAX** y tres páginas de Power BI. Se verificaron **103.851,74 unidades monetarias netas**, conciliando las ventas con las devoluciones del modelo importado. Empresa y datos simulados con fines de portafolio.
 
 ![Resumen ejecutivo de NexaMart](capturas/06_resumen_ejecutivo.png)
 
@@ -46,13 +46,13 @@ El origen se generó con inconsistencias intencionales para practicar un proceso
 | Sin vendedor identificado, conservados con clave `-1` | 6 |
 | Devoluciones conservadas como eventos de negocio | 6 |
 
-La conciliación es **765 − 5 − 3 = 757**. Los nulos en cliente y vendedor no implican perder la transacción. Las devoluciones se identifican mediante `es_devolucion`; los outliers quedan para revisión. El conteo final está respaldado por una captura de MySQL; los detalles del ETL proceden del proceso documentado y requieren los archivos originales para su verificación completa.
+La conciliación es **765 − 5 − 3 = 757**. Los nulos en cliente y vendedor no implican perder la transacción. Las devoluciones se identifican mediante `es_devolucion`; los outliers quedan para revisión. El PBIX confirma los 757 hechos, los miembros «No registrado» y las seis devoluciones. Se verificaron claves únicas, referencias a dimensiones e igualdad entre precio, cantidad e importe. El CSV crudo y el ETL original siguen pendientes; el [snapshot publicado](data/snapshot/README.md) recupera el estado importado del informe.
 
 ## Modelo de datos
 
 ![Diagrama relacional en MySQL](capturas/02_diagrama_mysql.png)
 
-`FactVentas` concentra fecha, cantidad, precio e identificadores. Se relaciona con `DimTienda`, `DimVendedor`, `DimProducto`, `DimCliente` y `DimMetodoPago`. Power BI incorpora `DimCalendario` para el análisis temporal.
+`FactVentas` concentra fecha, cantidad, precio e identificadores. Se relaciona con `DimTienda`, `DimVendedor`, `DimProducto`, `DimCliente` y `DimMetodoPago`. Power BI incorpora `DimCalendario` y once medidas DAX. La relación de calendario que aparece en la captura no se conserva en el PBIX adjunto: antes de validar los gráficos temporales debe restablecerse según las [instrucciones de reproducción](docs/reproduccion.md).
 
 Dos decisiones relevantes:
 
@@ -77,23 +77,23 @@ El archivo [consultas_analiticas.sql](sql/consultas_analiticas.sql) contiene **l
 
 ![Ranking global y por tienda en MySQL](capturas/04_ranking_vendedores_sql.png)
 
-El Top 3 se ordena por **importe**, no por unidades. El código preparado añade desempate por identificador y protección frente a división por cero. Las capturas muestran la ejecución de la versión original; la versión publicada aún requiere ejecución sobre la base original.
+El Top 3 se ordena por **importe**, no por unidades. El código preparado añade desempate por identificador y protección frente a división por cero. Las capturas muestran la ejecución de la versión original. La nueva carga del snapshot permite ejecutar las consultas sobre los datos importados del PBIX; la ejecución en un servidor MySQL requiere validación local.
 
 ## Dashboard: tres vistas para decidir
 
 ### 1. Resumen ejecutivo
 
-Compara tiendas y la tendencia mensual; presenta ventas totales, conteo de pedidos y ticket promedio. En la captura sin filtro, Singapore encabeza el importe mostrado por tienda.
+Compara tiendas y la tendencia mensual; presenta ventas totales, conteo de pedidos y ticket promedio. El snapshot confirma que Singapore encabeza el importe neto por tienda: **30.973,16**.
 
 ### 2. Productos y vendedores
 
-Relaciona el ranking comercial con el catálogo. Cristian Santos lidera el ranking general mostrado; la tabla permite identificar los tres productos con mayor importe dentro de cada categoría.
+Relaciona el ranking comercial con el catálogo. Cristian Santos lidera el importe neto entre vendedores identificados: **16.345,58**; la tabla permite identificar los tres productos con mayor importe dentro de cada categoría.
 
 ![Productos y vendedores](capturas/07_productos_vendedores.png)
 
 ### 3. Regional y calidad
 
-Integra distribución por ciudad, métodos de pago y devoluciones. Se observan **6 devoluciones sobre 757 registros: 0,79 %**. Es una proporción de registros marcados como devolución, no una tasa de unidades devueltas ni de pedidos originales devueltos.
+Integra las ubicaciones de las tiendas, métodos de pago y devoluciones. El mapa original representa presencia geográfica: no incorpora una medida de ventas para el tamaño de los puntos. Se observan **6 devoluciones sobre 757 registros: 0,79 %**. Es una proporción de registros marcados como devolución, no una tasa de unidades devueltas ni de pedidos originales devueltos.
 
 ![Regional y calidad](capturas/08_regional_calidad.png)
 
@@ -103,34 +103,50 @@ El filtro **Electronics** modifica el ranking y las ventas por tienda. Abigail S
 
 ![Dashboard filtrado por Electronics](capturas/09_filtro_electronics.png)
 
-## Métricas y alcance
+## Métricas conciliadas
 
-- El dashboard muestra **103,85 mil**, **757 pedidos** y **137,19 de ticket promedio**. Los importes se presentan como unidades monetarias de simulación: no se dispone de una divisa base ni de reglas de conversión documentadas.
-- Las consultas SQL comerciales excluyen devoluciones. El conteo del dashboard incluye los 757 registros, con sus 6 devoluciones. La definición de ventas y ticket debe conciliarse con las medidas del `.pbix` antes de comparar ambos resultados.
-- Se observa una diferencia entre SQL y Power BI para Smartwatch Series X: **10.499,58** frente a **10.249,59**. Debe revisarse con los datos y medidas originales; no se atribuye una causa sin comprobarla.
-- Hay 12 meses de datos, insuficientes para comparar cada mes con el mismo mes del año anterior. No se dispone de costos, margen, inventario ni metas; los resultados no demuestran rentabilidad ni impactos reales.
+| Indicador | Valor | Definición |
+|---|---:|---|
+| Ventas sin devoluciones | 104.718,63 | Suma de los 751 eventos de venta |
+| Importe de devoluciones | −866,89 | Seis eventos negativos |
+| **Ventas netas** | **103.851,74** | Ventas + devoluciones; medida actual del informe |
+| Pedidos/eventos del informe | 757 | DISTINCTCOUNT(order_id), incluidas devoluciones |
+| Ticket del informe | 137,19 | Importe neto / 757 eventos |
+| Proporción de devoluciones | 0,79 % | 6 / 757 eventos |
 
-Estas precisiones permiten interpretar las visualizaciones sin atribuirles conclusiones que el caso no mide.
+La diferencia entre SQL y Power BI responde al tratamiento de devoluciones. Para Smartwatch Series X se comprobó **10.499,58 − 249,99 = 10.249,59**. Las [fórmulas DAX originales](powerbi/medidas_originales.dax) permiten revisar esas definiciones.
+
+El conteo y el ticket del informe incluyen devoluciones: no representan 757 compras positivas ni el ticket medio de las 751 ventas. Los importes son unidades monetarias de simulación, sin conversión de divisas documentada. Hay 12 meses de datos, sin costos, margen, inventario ni metas; no se demuestra rentabilidad ni un YoY mensual completo.
 
 ## Contenido disponible
 
 | Ruta | Contenido |
 |---|---|
-| [sql/nexamart_schema.sql](sql/nexamart_schema.sql) | Esquema reconstruido a partir del DDL compartido; sin carga de datos |
+| [sql/nexamart_schema.sql](sql/nexamart_schema.sql) | Esquema basado en el DDL compartido, con nombres físicos en minúsculas |
 | [sql/consultas_analiticas.sql](sql/consultas_analiticas.sql) | Siete consultas y vista analítica |
-| [docs/decisiones_tecnicas.md](docs/decisiones_tecnicas.md) | ETL, modelo, DAX, métricas y límites de verificación |
+| [sql/nexamart_snapshot_data.sql](sql/nexamart_snapshot_data.sql) | Carga completa del estado importado del PBIX |
+| [sql/controles_snapshot.sql](sql/controles_snapshot.sql) | Conteos, referencias, signos e importes |
+| [powerbi/NexaMart.pbix](powerbi/NexaMart.pbix) | Archivo original entregado por el autor |
+| [powerbi/medidas_originales.dax](powerbi/medidas_originales.dax) | Once expresiones DAX originales |
+| [powerbi/tema_nexamart.json](powerbi/tema_nexamart.json) | Paleta personalizada recuperada del informe |
+| [data/snapshot/README.md](data/snapshot/README.md) | Seis tablas, calendario y manifiesto de verificación |
+| [scripts/exportar_snapshot_pbix.py](scripts/exportar_snapshot_pbix.py) | Utilidad de extracción; no sustituye al ETL original |
+| [docs/decisiones_tecnicas.md](docs/decisiones_tecnicas.md) | Modelo, métricas y alcance |
+| [docs/reproduccion.md](docs/reproduccion.md) | Instrucciones de revisión y ejecución |
 | [capturas/README.md](capturas/README.md) | Índice de las diez evidencias originales |
 | `capturas/` | Dashboard, filtro, base, modelos y consultas |
 
-**Pendientes de incorporar:** CSV crudo, limpio y de revisión; generador con semillas; `etl_limpieza.py`; carga completa de MySQL; tema JSON; archivo `.pbix` y definiciones DAX exactas. Sus nombres describen entregables del proyecto; no están incluidos todavía.
+**Pendientes del ETL original:** CSV crudo y de revisión, generador con semillas, `etl_limpieza.py` y salidas originales. La reproducción disponible empieza en el snapshot importado del PBIX; no reconstruye los errores que ya se retiraron.
 
 ## Cómo revisar esta entrega
 
-1. Consulta las capturas y las decisiones técnicas para recorrer el proyecto.
-2. En una instancia nueva de **MySQL 8.0 o superior**, ejecuta `sql/nexamart_schema.sql` para crear las tablas vacías. No incluye `DROP` ni elimina una base existente; si las tablas ya existen, utiliza una instancia de trabajo separada.
-3. Importa la carga original cuando esté disponible; el esquema vacío no permite reproducir los resultados.
-4. Ejecuta `sql/consultas_analiticas.sql` sobre la base cargada para revisar los análisis.
-5. Para reproducir el dashboard se requiere el `.pbix`, la conexión MySQL y las medidas originales. Las capturas son evidencia visual, no sustituyen el archivo interactivo.
+1. Descarga [NexaMart.pbix](powerbi/NexaMart.pbix) o consulta las capturas. El archivo conserva los mismos bytes que el adjunto original.
+2. En una instancia nueva de **MySQL 8.0+**, ejecuta el esquema y después `sql/nexamart_snapshot_data.sql`. La carga requiere tablas vacías; no borra ni reemplaza datos existentes.
+3. Ejecuta `sql/controles_snapshot.sql` y las consultas analíticas.
+4. En Power BI restablece la relación activa **DimCalendario[Date] (1) → nexamart factventas[fecha] (*)**, con filtro desde calendario, y marca la tabla de fechas. Ordena la tendencia por fecha ascendente.
+5. Para actualizar desde MySQL, ajusta el origen y las credenciales a tu entorno. Para extraer de nuevo el snapshot utiliza el script y `requirements_snapshot.txt`.
+
+La revisión verificó estructura, datos y expresiones mediante extracción; la apertura del informe en Power BI Desktop, la ejecución de DAX y la ejecución en MySQL requieren validación local. Los pasos están en [reproduccion.md](docs/reproduccion.md).
 
 ## Habilidades demostradas
 

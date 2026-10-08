@@ -1,0 +1,2 @@
+# Solo para volver a extraer el snapshot; no son las dependencias del ETL original.
+pbixray==0.15.5

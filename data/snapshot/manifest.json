@@ -1,0 +1,39 @@
+{
+  "origen": "Datos y metadatos recuperados del PBIX aportado por el autor",
+  "archivo": "powerbi/NexaMart.pbix",
+  "sha256_pbix": "3dfd06c161713a685390137c5893d811e191adc0a5779f4a5e9ff721340de292",
+  "lector": "pbixray 0.15.5",
+  "filas_por_tabla": {
+    "dimtienda": 4,
+    "dimvendedor": 9,
+    "dimproducto": 31,
+    "dimcliente": 171,
+    "dimmetodopago": 5,
+    "factventas": 757
+  },
+  "filas_calendario": 365,
+  "medidas_dax": 11,
+  "relaciones_base_recuperadas": 5,
+  "relacion_calendario_hechos_presente": false,
+  "metricas": {
+    "registros": 757,
+    "order_id_distintos": 757,
+    "ventas_sin_devoluciones_registros": 751,
+    "devoluciones_registros": 6,
+    "ventas_sin_devoluciones_centavos": 10471863,
+    "devoluciones_centavos": -86689,
+    "ventas_netas_centavos": 10385174,
+    "unidades_netas": 1026,
+    "sin_cliente_identificado": 10,
+    "sin_vendedor_identificado": 6,
+    "fecha_min": "2025-09-01",
+    "fecha_max": "2026-08-31"
+  },
+  "controles": {
+    "claves_unicas": true,
+    "integridad_dimensional": true,
+    "precio_por_cantidad": true,
+    "devoluciones_por_signo": true,
+    "conciliacion_importes": true
+  }
+}

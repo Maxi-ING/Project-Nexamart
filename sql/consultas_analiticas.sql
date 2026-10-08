@@ -1,24 +1,24 @@
 -- NexaMart | 7 consultas compartidas + vista añadida en esta publicación.
--- MySQL 8.0+. Requiere esquema y DATOS ORIGINALES cargados.
+-- MySQL 8.0+. Requiere esquema y snapshot cargados.
 -- Adaptaciones editoriales: identificadores en GROUP BY, desempates,
 -- NULLIF en divisiones. Ranking por tienda asignada al vendedor, como el original.
 -- Las capturas documentan la versión original, no estas adaptaciones.
 USE nexamart;
 
 -- Comprobación: 757 registros en la base original (incluye devoluciones).
-SELECT COUNT(*) AS total_registros FROM FactVentas;
+SELECT COUNT(*) AS total_registros FROM factventas;
 
 -- 1. Ventas por tienda: importes y pedidos SIN devoluciones.
 SELECT t.nombre_tienda, t.region,
        SUM(f.precio_total) AS ventas_sin_devoluciones,
        COUNT(DISTINCT f.order_id) AS pedidos_sin_devoluciones
-FROM FactVentas f
-JOIN DimTienda t ON f.tienda_id = t.tienda_id
+FROM factventas f
+JOIN dimtienda t ON f.tienda_id = t.tienda_id
 WHERE f.es_devolucion = 0
 GROUP BY t.tienda_id, t.nombre_tienda, t.region
 ORDER BY ventas_sin_devoluciones DESC, t.tienda_id;
 
--- 2. Ranking: ingresos por vendedor y su tienda asignada en DimVendedor.
+-- 2. Ranking: ingresos por vendedor y su tienda asignada en dimvendedor.
 -- La versión actual asigna cada vendedor a una sola tienda.
 -- Se excluye No registrado. Si hubiera movilidad de vendedores,
 -- se debería modelar esa historia antes de atribuir los ingresos por tienda.
@@ -26,9 +26,9 @@ WITH ventas_por_vendedor AS (
     SELECT v.vendedor_id, v.nombre_vendedor,
            t.tienda_id, t.nombre_tienda,
            SUM(f.precio_total) AS ventas_totales
-    FROM FactVentas f
-    JOIN DimVendedor v ON f.vendedor_id = v.vendedor_id
-    JOIN DimTienda t ON v.tienda_id = t.tienda_id
+    FROM factventas f
+    JOIN dimvendedor v ON f.vendedor_id = v.vendedor_id
+    JOIN dimtienda t ON v.tienda_id = t.tienda_id
     WHERE f.es_devolucion = 0 AND v.vendedor_id <> -1
     GROUP BY v.vendedor_id, v.nombre_vendedor, t.tienda_id, t.nombre_tienda
 )
@@ -44,8 +44,8 @@ WITH ventas_producto AS (
     SELECT p.producto_id, p.categoria, p.nombre_producto,
            SUM(f.cantidad) AS unidades_vendidas,
            SUM(f.precio_total) AS ventas_totales
-    FROM FactVentas f
-    JOIN DimProducto p ON f.producto_id = p.producto_id
+    FROM factventas f
+    JOIN dimproducto p ON f.producto_id = p.producto_id
     WHERE f.es_devolucion = 0
     GROUP BY p.producto_id, p.categoria, p.nombre_producto
 ), ranked AS (
@@ -65,10 +65,10 @@ SELECT mp.nombre_metodo,
        COUNT(*) AS num_transacciones,
        SUM(f.precio_total) AS ventas_totales,
        ROUND(100.0 * SUM(f.precio_total) / NULLIF(
-           (SELECT SUM(precio_total) FROM FactVentas WHERE es_devolucion = 0),
+           (SELECT SUM(precio_total) FROM factventas WHERE es_devolucion = 0),
            0), 2) AS porcentaje_ventas
-FROM FactVentas f
-JOIN DimMetodoPago mp ON f.metodo_pago_id = mp.metodo_pago_id
+FROM factventas f
+JOIN dimmetodopago mp ON f.metodo_pago_id = mp.metodo_pago_id
 WHERE f.es_devolucion = 0
 GROUP BY mp.metodo_pago_id, mp.nombre_metodo
 ORDER BY ventas_totales DESC, mp.metodo_pago_id;
@@ -77,7 +77,7 @@ ORDER BY ventas_totales DESC, mp.metodo_pago_id;
 SELECT DATE_FORMAT(fecha, '%Y-%m') AS mes,
        SUM(precio_total) AS ventas_totales,
        COUNT(DISTINCT order_id) AS total_pedidos
-FROM FactVentas
+FROM factventas
 WHERE es_devolucion = 0
 GROUP BY mes
 ORDER BY mes;
@@ -87,8 +87,8 @@ WITH gasto_cliente AS (
     SELECT c.cliente_id, c.nombre_cliente, c.segmento,
            SUM(f.precio_total) AS gasto_total,
            COUNT(DISTINCT f.order_id) AS num_compras
-    FROM FactVentas f
-    JOIN DimCliente c ON f.cliente_id = c.cliente_id
+    FROM factventas f
+    JOIN dimcliente c ON f.cliente_id = c.cliente_id
     WHERE f.es_devolucion = 0 AND c.cliente_id <> -1
     GROUP BY c.cliente_id, c.nombre_cliente, c.segmento
 )
@@ -105,8 +105,8 @@ SELECT p.categoria,
        COUNT(*) AS total_registros,
        ROUND(100.0 * SUM(CASE WHEN f.es_devolucion = 1 THEN 1 ELSE 0 END)
            / NULLIF(COUNT(*), 0), 2) AS tasa_devolucion_registros_pct
-FROM FactVentas f
-JOIN DimProducto p ON f.producto_id = p.producto_id
+FROM factventas f
+JOIN dimproducto p ON f.producto_id = p.producto_id
 GROUP BY p.categoria
 ORDER BY tasa_devolucion_registros_pct DESC, p.categoria;
 
@@ -122,9 +122,9 @@ SELECT f.order_id, f.fecha,
        f.producto_id, p.nombre_producto, p.categoria,
        f.metodo_pago_id, mp.nombre_metodo,
        f.cantidad, f.precio_unitario, f.precio_total, f.es_devolucion
-FROM FactVentas f
-LEFT JOIN DimTienda t ON f.tienda_id = t.tienda_id
-LEFT JOIN DimVendedor v ON f.vendedor_id = v.vendedor_id
-LEFT JOIN DimCliente c ON f.cliente_id = c.cliente_id
-LEFT JOIN DimProducto p ON f.producto_id = p.producto_id
-LEFT JOIN DimMetodoPago mp ON f.metodo_pago_id = mp.metodo_pago_id;
+FROM factventas f
+LEFT JOIN dimtienda t ON f.tienda_id = t.tienda_id
+LEFT JOIN dimvendedor v ON f.vendedor_id = v.vendedor_id
+LEFT JOIN dimcliente c ON f.cliente_id = c.cliente_id
+LEFT JOIN dimproducto p ON f.producto_id = p.producto_id
+LEFT JOIN dimmetodopago mp ON f.metodo_pago_id = mp.metodo_pago_id;

@@ -1,0 +1,32 @@
+producto_id,nombre_producto,categoria,precio_unitario
+1,Wireless Earbuds Pro,Electronics,89.99
+2,Smartwatch Series X,Electronics,249.99
+3,Portable Power Bank 20000mAh,Electronics,39.99
+4,Noise Cancelling Headphones,Electronics,179.99
+5,Smart Ring Fitness Tracker,Electronics,299.99
+6,Bluetooth Speaker Mini,Electronics,59.99
+7,Tablet 10-inch,Electronics,329.99
+8,USB-C Fast Charger 65W,Electronics,29.99
+9,Air Fryer Digital 5L,Smart Home,79.99
+10,Robot Vacuum Cleaner,Smart Home,249.99
+11,Smart LED Light Bulb Kit,Smart Home,34.99
+12,Coffee Maker Programmable,Smart Home,64.99
+13,Smart Video Doorbell,Smart Home,129.99
+14,Air Purifier Compact,Smart Home,149.99
+15,Oversized Hoodie Unisex,Fashion,44.99
+16,Running Sneakers Lightweight,Fashion,89.99
+17,Denim Jacket Classic,Fashion,69.99
+18,Everyday Tote Bag,Fashion,34.99
+19,Polarized Sunglasses,Fashion,24.99
+20,Wool Blend Sweater,Fashion,54.99
+21,Adjustable Dumbbell Set,Sports & Fitness,119.99
+22,Yoga Mat Non-Slip,Sports & Fitness,29.99
+23,Resistance Bands Set,Sports & Fitness,19.99
+24,Insulated Water Bottle,Sports & Fitness,22.99
+25,Foam Roller Recovery,Sports & Fitness,27.99
+26,Foldable Treadmill,Sports & Fitness,399.99
+27,Vitamin C Serum,Beauty & Personal Care,24.99
+28,LED Facial Cleansing Brush,Beauty & Personal Care,39.99
+29,Hair Straightener Ceramic,Beauty & Personal Care,49.99
+30,SPF 50 Sunscreen Lotion,Beauty & Personal Care,18.99
+31,Electric Trimmer Kit,Beauty & Personal Care,34.99
