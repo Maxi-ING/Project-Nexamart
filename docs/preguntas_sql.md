@@ -1,6 +1,6 @@
 # NexaMart | Diez preguntas comerciales respondidas con SQL
 
-Cada pregunta corresponde al número de consulta en [consultas_analiticas.sql](../sql/consultas_analiticas.sql). Los resultados abarcan las cuatro tiendas y todo el período; las consultas 9 y 10 profundizan una comparación concreta.
+Cada pregunta corresponde al número de consulta en `sql/consultas_analiticas.sql`. Los resultados abarcan las cuatro tiendas y todo el período; las consultas 9 y 10 profundizan una comparación concreta.
 
 | Consulta y pregunta | Respuesta del análisis | Para qué sirve | Técnica SQL |
 |---|---|---|---|
@@ -19,10 +19,10 @@ Cada pregunta corresponde al número de consulta en [consultas_analiticas.sql](.
 
 El dashboard permite explorar tiendas, productos, vendedores, fechas y pagos. La comparación Singapore–Sydney ilustra cómo profundizar una diferencia: primero localizarla, después separar volumen y ticket y finalmente identificar categorías para investigar.
 
-[Ver la conclusión comercial desarrollada](conclusion_comercial.md) · [Descargar dashboard](../powerbi/NexaMart.pbix)
+La conclusión breve está en `docs/conclusion_comercial.md`; el informe está en `powerbi/NexaMart.pbix`.
 
 ## Cómo interpretar las cifras
 
 Rankings y participaciones utilizan ventas netas. Las compras excluyen eventos de devolución; el ticket es ventas brutas / compras. La proporción de devolución mide eventos, no pedidos originales devueltos. Los datos son simulados y las acciones propuestas no demuestran causas, productividad o rentabilidad.
 
-[Resultados completos de las diez consultas](../data/resultados/respuestas_sql.json). Se obtuvieron adaptando el SQL MySQL a SQLite sobre los datos del informe; esta comprobación no sustituye la ejecución nativa en MySQL.
+Los resultados completos están en `data/resultados/respuestas_sql.json`. Se obtuvieron adaptando el SQL MySQL a SQLite sobre los datos del informe; esta comprobación no sustituye la ejecución nativa en MySQL.

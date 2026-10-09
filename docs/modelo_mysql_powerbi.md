@@ -29,4 +29,4 @@ La diferencia vendedor–tienda evita caminos de filtro ambiguos en Power BI. El
 
 La relación calendario–ventas está presente y activa tanto en el archivo inicial como en el actualizado. La revisión inicial la había omitido porque PBIXRay filtra tablas con `SystemFlags` distintos de cero, incluyendo tablas calculadas. Se corrigió el extractor para consultar las relaciones completas y excluir únicamente las tablas automáticas de fecha. No era una relación faltante del proyecto.
 
-[Relaciones extraídas del PBIX actual](../powerbi/relaciones_actuales.json) · [Esquema SQL](../sql/nexamart_schema.sql) · [Revisión del archivo actualizado](revision_pbix_actualizado.json)
+Las relaciones extraídas están en `powerbi/relaciones_actuales.json`, el esquema en `sql/nexamart_schema.sql` y la revisión del archivo en `docs/revision_pbix_actualizado.json`.

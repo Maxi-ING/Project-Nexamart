@@ -2,19 +2,13 @@
 
 **SQL · MySQL · Power BI · DAX**
 
-¿Qué tiendas venden más, qué productos impulsan el resultado y dónde conviene actuar? Este proyecto utiliza **SQL para responder preguntas comerciales** y un **dashboard de Power BI para explorar los resultados y apoyar decisiones**.
+**Identifiqué dónde se concentran las ventas y qué conviene revisar.** Singapore lidera el resultado; los rankings destacan productos y vendedores, y las devoluciones señalan casos para seguimiento. Las consultas SQL respaldan estas respuestas y el dashboard permite explorarlas con filtros.
 
-NexaMart es una cadena ficticia con tiendas en **New York, London, Singapore y Sydney**. El análisis reúne **757 registros, 31 productos y 12 meses**, de septiembre de 2025 a agosto de 2026. Datos simulados con fines de portafolio.
+NexaMart es una cadena ficticia con tiendas en **New York, London, Singapore y Sydney**. Analicé **757 registros, 31 productos y 12 meses**, de septiembre de 2025 a agosto de 2026. Los datos son simulados con fines de portafolio.
 
-[Explorar consultas SQL](sql/consultas_analiticas.sql) · [Descargar dashboard](powerbi/NexaMart.pbix) · [Ver caso en Notion](https://app.notion.com/p/3f3711ab612481f9a5b6fe8d50bfbdbd)
+## Las respuestas que obtuve con SQL
 
-## 1. El objetivo del análisis
-
-Dar a la gerencia una visión común de las cuatro tiendas para comparar ventas, identificar productos y vendedores destacados y localizar señales de devolución. Los resultados orientan revisiones de surtido, seguimiento comercial y atención a casos concretos.
-
-## 2. SQL: de las preguntas a las respuestas
-
-Desarrollé **diez consultas** con JOINs, CTEs, funciones de ventana, subconsultas y agregación condicional. Estos son algunos resultados:
+Desarrollé **diez consultas** con JOINs, CTEs, funciones de ventana, subconsultas y agregación condicional. Estos son algunos hallazgos:
 
 | Pregunta de negocio | Respuesta obtenida | Técnica SQL |
 |---|---|---|
@@ -25,7 +19,7 @@ Desarrollé **diez consultas** con JOINs, CTEs, funciones de ventana, subconsult
 | ¿Qué medio de pago tiene mayor peso? | Credit Card: **31,26 %** del importe neto. | Subconsulta + porcentaje |
 | ¿Dónde revisar devoluciones? | Fashion y Electronics reúnen **cinco de los seis casos**. | CASE + agregación condicional |
 
-[Ver las diez preguntas, sus respuestas y su utilidad comercial](docs/preguntas_sql.md).
+Las diez preguntas y sus respuestas están en `docs/preguntas_sql.md`; el código está en `sql/consultas_analiticas.sql`.
 
 <details>
 <summary>Ejemplo SQL: ranking global y por tienda</summary>
@@ -41,49 +35,43 @@ SELECT *,
 FROM ventas_por_vendedor;
 ```
 
-[Ver consulta completa](sql/consultas_analiticas.sql) · [Evidencia original de ejecución en MySQL](capturas/04_ranking_vendedores_sql.png)
+La consulta completa está en `sql/consultas_analiticas.sql`; su evidencia original está en `capturas/04_ranking_vendedores_sql.png`.
 
 </details>
 
-## 3. Dashboard: explorar y decidir
+## Cómo usaría el dashboard para decidir
 
-### Resumen ejecutivo — Comparar tiendas y evolución mensual
+### Resumen ejecutivo
 
-**Hallazgo:** Singapore supera a Sydney en **8.690,55 netos**. SQL muestra que la mayor contribución a esa diferencia corresponde al ticket por compra.
-
-**Decisión que orienta:** revisar Sports & Fitness en Sydney. Esta categoría concentra **65,46 % de la brecha**, pese a tener 37 compras en cada tienda. Conviene contrastar surtido, disponibilidad y unidades por compra.
+Comparo tiendas y evolución mensual. Singapore supera a Sydney en **8.690,55 netos**; Sports & Fitness concentra **65,46 % de la brecha**. Empezaría por revisar surtido y disponibilidad de esa categoría en Sydney.
 
 ![Resumen ejecutivo](capturas/06_resumen_ejecutivo.png)
 
-[Profundizar la comparación Singapore–Sydney](docs/conclusion_comercial.md).
+### Productos y vendedores
 
-### Productos y vendedores — Identificar qué impulsa las ventas
-
-**Hallazgo:** Foldable Treadmill genera **16.399,59 netos** y Cristian Santos lidera el ranking de vendedores identificados.
-
-**Decisión que orienta:** revisar disponibilidad de los productos destacados y comparar prácticas comerciales de los vendedores, usando los filtros del informe.
+Identifico qué impulsa las ventas. Foldable Treadmill genera **16.399,59 netos** y Cristian Santos lidera entre vendedores identificados. Revisaría la disponibilidad de los productos destacados y contrastaría prácticas comerciales de los vendedores.
 
 ![Productos y vendedores](capturas/07_productos_vendedores.png)
 
-### Regional y calidad — Vigilar pagos y devoluciones
+### Regional y calidad
 
-**Hallazgo:** Credit Card concentra el mayor importe neto. Se registran **seis devoluciones entre 757 eventos: 0,79 %**.
-
-**Decisión que orienta:** revisar los casos de Fashion y Electronics y dar seguimiento a los medios de pago más utilizados. El mapa permite ubicar las tiendas.
+Vigilo pagos y devoluciones. Credit Card concentra **31,26 % del importe neto** y Fashion y Electronics reúnen cinco de los seis casos de devolución. Revisaría esos casos y mantendría seguimiento por período.
 
 ![Regional y calidad](capturas/08_regional_calidad.png)
 
-## 4. Indicadores y modelo compartido
+## Cómo interpretar el resultado
 
-**Ventas netas: 103.851,74 · Compras: 751 · Ticket promedio: 139,44.**
+**103.851,74 netos · 751 compras · Ticket promedio de 139,44.**
 
-Las ventas netas descuentan devoluciones; el ticket utiliza ventas brutas divididas entre compras, excluyendo eventos de devolución. Los importes se expresan en unidades monetarias de simulación. Las recomendaciones plantean acciones para investigar; los datos no permiten demostrar rentabilidad ni causas.
+Las ventas netas descuentan devoluciones. El ticket es ventas brutas divididas entre compras, excluyendo devoluciones. Los importes son unidades monetarias de simulación; las recomendaciones proponen qué investigar, sin atribuir causas ni demostrar rentabilidad.
 
-MySQL organiza ventas y dimensiones; Power BI utiliza esas mismas tablas para conectar filtros e indicadores y añade el calendario. [Ver ambos diagramas y su correspondencia](docs/modelo_mysql_powerbi.md).
+MySQL y Power BI comparten las tablas de ventas y dimensiones. Sus diagramas y correspondencia están en `docs/modelo_mysql_powerbi.md`.
 
-## 5. Cómo explorar el proyecto
+## Dónde encontrar cada parte
 
-- **Consultas y respuestas:** [SQL](sql/consultas_analiticas.sql) y [guía de preguntas](docs/preguntas_sql.md).
-- **Dashboard:** [archivo Power BI](powerbi/NexaMart.pbix) y [guía de uso](powerbi/README.md).
-- **Base de datos:** [esquema y carga](sql/) y [pasos para reproducir](docs/reproduccion.md).
-- **Evidencias y detalle:** [capturas](capturas/README.md), [análisis comercial](docs/conclusion_comercial.md) y [definiciones técnicas](docs/decisiones_tecnicas.md).
+| Carpeta | Contenido |
+|---|---|
+| `sql/` | Consultas comerciales, esquema, carga y controles. |
+| `powerbi/` | Informe `NexaMart.pbix`, medidas y guía de uso. |
+| `docs/` | Preguntas respondidas, modelo, criterios técnicos y reproducción. La conclusión comercial es una nota breve de apoyo. |
+| `capturas/` y `data/` | Evidencias del proceso, datos y resultados. |
