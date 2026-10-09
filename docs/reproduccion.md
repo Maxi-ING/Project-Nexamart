@@ -12,8 +12,7 @@ En una base de trabajo nueva, ejecuta estos archivos en orden:
 
 1. `sql/nexamart_schema.sql`: crea las tablas y relaciones.
 2. `sql/nexamart_snapshot_data.sql`: carga los datos del informe. Requiere tablas vacías; ejecútalo una sola vez.
-3. `sql/controles_snapshot.sql`: comprueba conteos e indicadores.
-4. `sql/consultas_analiticas.sql`: responde diez preguntas y crea o actualiza la vista analítica.
+3. `sql/consultas_analiticas.sql`: responde diez preguntas y crea o actualiza la vista analítica.
 
 Después compara tus resultados con la guía de la carpeta `docs/`, llamada `preguntas_sql.md`. La carga no borra ni reemplaza datos; la vista se actualiza con CREATE OR REPLACE VIEW.
 

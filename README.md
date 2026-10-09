@@ -71,7 +71,7 @@ MySQL y Power BI comparten las tablas de ventas y dimensiones. Sus diagramas y c
 
 | Carpeta | Contenido |
 |---|---|
-| `sql/` | Consultas comerciales, esquema, carga y controles. |
+| `sql/` | Consultas comerciales, esquema y carga de datos. |
 | `powerbi/` | Informe `NexaMart.pbix`, medidas y guía de uso. |
 | `docs/` | Preguntas respondidas, modelo, criterios técnicos y reproducción. La conclusión comercial es una nota breve de apoyo. |
 | `capturas/` y `data/` | Evidencias del proceso, datos y resultados. |
