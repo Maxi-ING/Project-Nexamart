@@ -1,34 +1,35 @@
-# NexaMart | Revisar y reproducir el análisis
+# NexaMart | Explorar y reproducir el análisis
 
-## Power BI actualizado
+## Consultar el dashboard
 
-Descarga [NexaMart.pbix](../powerbi/NexaMart.pbix) y ábrelo en Desktop. El autor aportó este archivo guardado y las capturas actualizadas. Los resultados esperados son bruto 104.718,63; devuelto 866,89; neto 103.851,74; 751 compras; ticket 139,44.
+Descarga [NexaMart.pbix](../powerbi/NexaMart.pbix), ábrelo en Power BI Desktop y recorre sus tres páginas. Puedes explorar el informe con los datos importados, sin conectar tu propia base de datos.
 
-La relación calendario–ventas está activa y el calendario tiene 730 días. Sigue los ajustes restantes de Año-Mes, orden y marca de fechas descritos en [powerbi/README.md](../powerbi/README.md). Para actualizar desde MySQL, ajusta las seis consultas originales a tu servidor y tus credenciales.
+Con todos los datos, los indicadores principales son **103.851,74 netos, 751 compras y ticket promedio 139,44**. [Ver la guía del dashboard](../powerbi/README.md).
 
-El PBIP alternativo es una propuesta editable con configuración explícita y no corresponde a las nuevas capturas; su apertura y ejecución en Desktop siguen pendientes. El PBIX inicial se conserva en powerbi/historico.
+## Ejecutar el análisis SQL en MySQL 8.0+
 
-## Restaurar los datos en MySQL 8.0+
+En una base de trabajo nueva, ejecuta estos archivos en orden:
 
-En una base de trabajo nueva, ejecuta en orden:
+1. [nexamart_schema.sql](../sql/nexamart_schema.sql): crea las tablas y relaciones.
+2. [nexamart_snapshot_data.sql](../sql/nexamart_snapshot_data.sql): carga los datos del informe. Requiere tablas vacías; ejecútalo una sola vez.
+3. [controles_snapshot.sql](../sql/controles_snapshot.sql): comprueba conteos e indicadores.
+4. [consultas_analiticas.sql](../sql/consultas_analiticas.sql): responde diez preguntas y crea o actualiza la vista analítica.
 
-1. sql/nexamart_schema.sql: crea las seis tablas.
-2. sql/nexamart_snapshot_data.sql: carga dimensiones y hechos. Requiere tablas vacías; no ejecutar dos veces.
-3. sql/controles_snapshot.sql: concilia conteos, referencias e indicadores.
-4. sql/consultas_analiticas.sql: ejecuta diez consultas y crea o actualiza la vista analítica del proyecto.
+Después compara tus resultados con la [guía de preguntas y respuestas](preguntas_sql.md). La carga no borra ni reemplaza datos; la vista se actualiza con CREATE OR REPLACE VIEW.
 
-Los INSERT no borran ni reemplazan datos. Usa otra instancia de trabajo si ya tienes la base original. La vista sí se actualiza con CREATE OR REPLACE VIEW, para incorporar los campos de bruto y devuelto.
+## Actualizar Power BI desde tu MySQL
 
-En Desktop, cambia pModo a MySQL y configura pServidor, pBase y tus credenciales localmente. No se publican credenciales.
+En el PBIX principal, abre Transformar datos y ajusta el servidor y la base de datos en el paso de origen de las seis consultas. Configura tus credenciales localmente y actualiza el informe.
 
-## Verificación local de esta entrega
+## Verificación de apoyo
+
+Las respuestas publicadas se comprobaron sobre los datos del informe mediante adaptación del SQL a SQLite. [Resultados completos](../data/resultados/respuestas_sql.json). Los datos del snapshot se recuperaron del PBIX; no incluyen el CSV sucio ni el ETL original.
+
+Para revisar también el proyecto PBIP alternativo:
 
 ```bash
 python -m pip install -r requirements_verificacion.txt
-python scripts/construir_powerbi_corregido.py
 python scripts/verificar_correcciones.py
 ```
 
-La verificación interpreta SQL MySQL con sqlglot, lo adapta a SQLite y compara los resultados con los CSV. Comprueba relaciones, referencias de visuales, datos portátiles, orden mensual, esquemas JSON oficiales e integridad ZIP. No ejecuta el motor DAX ni MySQL.
-
-Los resultados están en data/resultados y el registro en docs/validacion_correcciones.json. Para reproducir el origen recuperado utiliza scripts/exportar_snapshot_pbix.py con requirements_snapshot.txt; conserva el PBIX inicial en powerbi/historico y su manifiesto.
+Este control concilia SQL y datos y comprueba la estructura del PBIP. No ejecuta MySQL ni DAX/Desktop. [Alcance técnico](decisiones_tecnicas.md) y [registro](validacion_correcciones.json).
