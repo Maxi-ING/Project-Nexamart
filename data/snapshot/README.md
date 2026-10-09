@@ -15,3 +15,5 @@ Los CSV se extrajeron del modelo importado de `powerbi/NexaMart.pbix`. Conservan
 Los importes tienen dos decimales; las fechas, formato ISO. es_devolucion se conserva como booleano en CSV y se convierte a 0/1 en la carga MySQL.
 
 El manifiesto registra SHA-256 del PBIX y controles de claves, integridad dimensional, signos, precio por cantidad y conciliación. El script de extracción permite repetir el proceso. Los datos y correos son simulados, según el contexto del autor.
+
+El calendario de este snapshot conserva los 365 días originales. El modelo PBIP revisado genera años completos 2025–2026 y utiliza los mismos 757 hechos. Las métricas actuales están en [decisiones_tecnicas.md](../../docs/decisiones_tecnicas.md).

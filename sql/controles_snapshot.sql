@@ -16,11 +16,12 @@ SELECT COUNT(*) AS eventos, COUNT(DISTINCT order_id) AS ids_distintos,
        MIN(fecha) AS fecha_inicio, MAX(fecha) AS fecha_fin
 FROM factventas;
 
--- 104718.63 - 866.89 = 103851.74; ticket 137.19; proporción 0.79%.
-SELECT SUM(CASE WHEN es_devolucion = 0 THEN precio_total ELSE 0 END) AS ventas_sin_devoluciones,
-       SUM(CASE WHEN es_devolucion = 1 THEN precio_total ELSE 0 END) AS importe_devoluciones,
+-- 104718.63 - 866.89 = 103851.74; ticket de compra 139.44; proporción 0.79%.
+SELECT SUM(CASE WHEN es_devolucion = 0 THEN precio_total ELSE 0 END) AS ventas_brutas,
+       -SUM(CASE WHEN es_devolucion = 1 THEN precio_total ELSE 0 END) AS importe_devoluciones,
        SUM(precio_total) AS neto,
-       ROUND(SUM(precio_total) / NULLIF(COUNT(DISTINCT order_id), 0), 2) AS ticket_por_evento,
+       COUNT(DISTINCT CASE WHEN es_devolucion = 0 THEN order_id END) AS pedidos_venta,
+       ROUND(SUM(CASE WHEN es_devolucion = 0 THEN precio_total ELSE 0 END) / NULLIF(COUNT(DISTINCT CASE WHEN es_devolucion = 0 THEN order_id END), 0), 2) AS ticket_promedio,
        ROUND(100.0 * SUM(CASE WHEN es_devolucion = 1 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0), 2) AS devoluciones_pct
 FROM factventas;
 
@@ -49,8 +50,8 @@ FROM factventas WHERE es_devolucion IS NULL OR es_devolucion NOT IN (0, 1)
 
 -- 10499.58 - 249.99 = 10249.59.
 SELECT p.nombre_producto,
-       SUM(CASE WHEN f.es_devolucion = 0 THEN f.precio_total ELSE 0 END) AS sin_devoluciones,
-       SUM(CASE WHEN f.es_devolucion = 1 THEN f.precio_total ELSE 0 END) AS devoluciones,
+       SUM(CASE WHEN f.es_devolucion = 0 THEN f.precio_total ELSE 0 END) AS ventas_brutas,
+       -SUM(CASE WHEN f.es_devolucion = 1 THEN f.precio_total ELSE 0 END) AS importe_devoluciones,
        SUM(f.precio_total) AS neto
 FROM factventas f JOIN dimproducto p ON f.producto_id = p.producto_id
 WHERE p.nombre_producto = 'Smartwatch Series X'

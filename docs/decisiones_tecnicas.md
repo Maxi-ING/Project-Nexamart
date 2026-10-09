@@ -1,99 +1,46 @@
-# NexaMart | Decisiones técnicas y definición de métricas
+# NexaMart | Modelo y métricas del análisis
 
-## Evidencia y trazabilidad
+## Convención común SQL–Power BI
 
-La publicación combina el resumen del autor, el DDL y las siete consultas compartidas, diez capturas y el PBIX original. Se recuperaron seis tablas de origen, calendario, **once medidas DAX**, relaciones y paleta con PBIXRay 0.15.5.
+El SQL publicado y las 15 medidas del modelo editable usan la misma definición. Las fórmulas originales se conservan en powerbi/medidas_originales.dax para trazabilidad.
 
-El [manifiesto](../data/snapshot/manifest.json) registra el SHA-256 del PBIX, conteos, controles e importes en centavos. El archivo publicado conserva los bytes del adjunto. La extracción inspecciona datos y metadatos; no ejecuta el motor DAX ni equivale a abrir Power BI Desktop.
+| Métrica | Definición | Resultado |
+|---|---|---:|
+| Ventas Brutas | Importe de eventos es_devolucion = false | 104.718,63 |
+| Importe Devoluciones | Negativo de la suma de los eventos de devolución | 866,89 |
+| Ventas Netas | Suma firmada de todos los importes; equivale a bruto − devuelto | 103.851,74 |
+| Pedidos Venta | DISTINCTCOUNT(order_id) solo en ventas | 751 |
+| Ticket Promedio | Ventas Brutas / Pedidos Venta | 139,44 |
+| Total Eventos | Todas las claves order_id | 757 |
+| Total Devoluciones | Eventos es_devolucion = true | 6 |
+| Proporción Eventos Devolución | Total Devoluciones / Total Eventos | 0,79 % |
+| Unidades Vendidas | Cantidades de eventos de venta | 1.037 |
+| Unidades Netas | Suma firmada de cantidades | 1.026 |
 
-## 1. ETL documentado y datos comprobados
+El ticket anterior (137,19) dividía ventas netas entre 757 eventos, incluidas devoluciones. El nuevo ticket mide compras positivas. Las devoluciones no se relacionan con el pedido original; por eso la proporción de eventos no se presenta como tasa de pedidos devueltos.
 
-El proceso descrito usa Python y Faker, normaliza tres formatos de fecha y texto, elimina cinco duplicados y aparta tres cantidades atípicas. La conciliación descrita es **765 − 5 − 3 = 757**.
+## Modelo y calendario
 
-El PBIX confirma 757 hechos, 31 productos, cuatro tiendas, cinco métodos de pago, 171 miembros de cliente y nueve de vendedor. Clientes y vendedores incluyen «No registrado». Diez hechos usan cliente -1, seis usan vendedor -1 y seis son devoluciones.
+La clave primaria order_id permite un producto por pedido. Una versión con varias líneas requiere otra clave de hecho. MySQL conserva cinco dimensiones y la relación adicional vendedor–tienda. El modelo PBIP tiene seis relaciones activas: cinco dimensiones más calendario, todas con filtro desde la dimensión hacia hechos. No hay relación adicional vendedor–tienda en Power BI.
 
-Se verificaron claves únicas, referencias a las cinco dimensiones, tiendas de vendedores, signos de devolución y precio × cantidad = importe. Los importes se conciliaron en centavos.
+El calendario corregido abarca años completos 2025–2026, tiene Date como clave y categoría de tabla Time. Año-Mes es texto y se ordena por AñoMesOrden. La tendencia se ordena ascendentemente por mes. La ampliación no agrega hechos: 2025 sigue teniendo datos solo desde septiembre y no permite YoY mensual completo.
 
-El snapshot no recupera el CSV sucio, duplicados retirados, outliers apartados, generador, semillas ni ETL original. Esos archivos siguen pendientes; la reproducción disponible comienza en el estado importado.
+Los rankings y porcentajes de pago usan ventas netas. El Top 3 SQL utiliza ROW_NUMBER y producto_id para desempatar; el ranking DAX aplica el mismo desempate. El ranking SQL por tienda usa la tienda del hecho, como el filtro del dashboard. No registrado conserva sus ventas, aunque queda fuera del ranking de vendedores identificados.
 
-## 2. Grano y modelo
+## Explicación comercial
 
-La clave primaria order_id permite un producto por pedido. Una ampliación a pedidos con varias líneas requeriría una clave independiente de línea.
+Las consultas 9 y 10 descomponen la brecha Singapore–Sydney por volumen y ticket, y muestran contribuciones por categoría. La descomposición simétrica reparte la interacción entre volumen y ticket. La suma concilia con 8.690,55 netos. El desglose por categoría es otra lectura de esa misma brecha y no se añade a los factores anteriores.
 
-MySQL conserva cinco dimensiones y una relación adicional vendedor-tienda. El modelo extraído del PBIX contiene **cinco relaciones base activas**, de muchos a uno y filtro único desde dimensiones hacia hechos. No conserva la relación vendedor-tienda.
+La conclusión y sus recomendaciones están en [conclusion_comercial.md](conclusion_comercial.md).
 
-Los nombres físicos de tablas SQL se publican en minúsculas para coincidir con las consultas MySQL del PBIX y evitar diferencias de mayúsculas entre entornos.
+## Trazabilidad y validación
 
-## 3. Calendario y diferencias entre versiones
+El PBIX original y las diez capturas conservan sus bytes. El snapshot recuperado confirma 757 hechos, referencias a dimensiones, signos, precios y cantidades. Su manifiesto describe el archivo original; el calendario de 365 días del snapshot no es el calendario ampliado del PBIP.
 
-La expresión original de DimCalendario usa CALENDAR entre septiembre de 2025 y agosto de 2026: **365 días**. El calendario y su expresión se publican.
+El proyecto [PBIP](../powerbi/README.md) reutiliza las tres páginas y el tema original, con calendario, medidas y referencias de visuales revisados. Incluye modo Snapshot portátil y modo MySQL mediante parámetros. La conexión principal continúa siendo MySQL en modo Import.
 
-**La captura muestra una relación de calendario a ventas que falta en los metadatos del PBIX adjunto.** Antes de validar tendencia, MoM y YTD, debe crearse una relación activa DimCalendario[Date] (1) → nexamart factventas[fecha] (*), con filtro desde calendario, y marcar la tabla de fechas.
+[validacion_correcciones.json](validacion_correcciones.json) registra el alcance real: diez consultas interpretadas con dialecto MySQL y ejecutadas mediante adaptación a SQLite, conciliación independiente de resultados y validación estructural del PBIP/PBIR. No equivale a ejecutar DAX/Desktop o MySQL 8.0. La apertura, actualización y guardado del PBIX final requieren Desktop.
 
-El gráfico de tendencia registra orden por ventas descendente; debe ajustarse a fecha ascendente. El calendario operativo no contiene años naturales completos: YTD de 2025 solo dispone de septiembre-diciembre. No hay YoY mensual completo.
+Los datos son simulados y los importes no tienen conversión de divisas documentada. Sin costos, stock, tráfico u horas no se infiere rentabilidad, causalidad o productividad. Seis devoluciones no bastan para atribuir fallas sistemáticas. El mapa original muestra presencia geográfica.
 
-El mapa original usa ciudad como ubicación, sin una medida de ventas en el tamaño de puntos; se interpreta como presencia geográfica.
-
-## 4. DAX original
-
-Las expresiones están en [medidas_originales.dax](../powerbi/medidas_originales.dax).
-
-| Medida | Regla |
-|---|---|
-| Ventas Totales | SUM(precio_total), con devoluciones |
-| Unidades Vendidas | SUM(cantidad), unidades netas |
-| Total Pedidos | DISTINCTCOUNT(order_id), incluye devoluciones |
-| Ticket Promedio | Ventas Totales / Total Pedidos |
-| Ventas Mes Anterior | CALCULATE y DATEADD |
-| % Crecimiento MoM | Variación respecto del mes anterior |
-| Ventas YTD | TOTALYTD |
-| Ranking Vendedor | RANKX con ALL(nombre_vendedor) |
-| Ranking Producto en Categoría | RANKX con ALLEXCEPT(..., categoria) |
-| Total Devoluciones | Conteo de pedidos con booleano TRUE() |
-| % Tasa Devolución | Total Devoluciones / Total Pedidos |
-
-SQL compara es_devolucion con 1; Power BI lo importa como booleano. RANKX depende del contexto y puede asignar puestos empatados; ROW_NUMBER con desempate limita a tres filas. No se reescribieron las medidas originales.
-
-## 5. Métricas conciliadas
-
-| Indicador | Valor |
-|---|---:|
-| Eventos y order_id distintos | 757 |
-| Eventos de venta / devolución | 751 / 6 |
-| Ventas sin devoluciones | 104.718,63 |
-| Importe de devoluciones | −866,89 |
-| Ventas netas | 103.851,74 |
-| Unidades netas | 1.026 |
-| Ticket original: neto / 757 | 137,19 |
-| Ticket de ventas positivas: 104.718,63 / 751 | 139,44 |
-| Proporción de devoluciones: 6 / 757 | 0,79 % |
-
-**104.718,63 − 866,89 = 103.851,74.** El DAX original suma importes negativos; el SQL comercial los excluye.
-
-Smartwatch Series X tiene una devolución de **249,99**, que explica **10.499,58 − 249,99 = 10.249,59**. Esta causa se comprobó en los registros del PBIX.
-
-El ticket original divide neto entre eventos, incluidas devoluciones. La tasa mide eventos de devolución sobre todos los eventos; no unidades ni pedidos originales devueltos. No existe un vínculo entre devolución y compra original.
-
-Los importes son unidades monetarias de simulación. No se documentaron divisas ni conversión entre países. Sin costos, metas o inventario no se infiere rentabilidad.
-
-## 6. SQL y validación
-
-El esquema parte del DDL compartido. La nueva carga se generó con los datos importados del PBIX, respetando claves y dependencias. **No es la carga original del ETL.** Los INSERT se agrupan hasta en 100 filas y no borran ni reemplazan datos.
-
-Las siete consultas conservan las preguntas originales, con agrupación por identificador, desempates y NULLIF. El ranking por tienda usa la asignación de vendedor; la movilidad histórica requeriría otro modelo.
-
-La vista vw_ventas_analitico es una definición propuesta; el DDL original no se recibió. Usa LEFT JOIN y conserva devoluciones. CREATE VIEW evita sobrescribir una vista existente.
-
-Los conteos, claves, signos e importes se verificaron mediante extracción y controles locales. La ejecución en MySQL y la evaluación DAX en Desktop requieren validación local. Las capturas SQL respaldan la versión original.
-
-## 7. Hallazgos e identidad visual
-
-- Singapore concentra **30.973,16 netos**.
-- Cristian Santos lidera entre vendedores identificados con **16.345,58 netos**.
-- Foldable Treadmill concentra **16.399,59 netos**, el mayor importe por producto.
-- La captura filtrada por Electronics muestra a Abigail Shaffer liderando.
-- Se observan seis devoluciones y mayor proporción en Fashion.
-
-Los hallazgos orientan preguntas comerciales; no prueban productividad ajustada por horas ni causas de devolución. Seis casos son una muestra pequeña para atribuir problemas sistemáticos.
-
-La paleta extraída recupera ocho dataColors. El diseño completo permanece en el PBIX; no se inventaron estilos adicionales. La entrega incorpora PBIX, DAX, calendario, relaciones, paleta, siete CSV, manifiesto, carga SQL, controles y utilidad de extracción.
+La preparación en Python se documentó en el origen. El CSV sucio y el ETL original no se recuperaron; la reproducción comienza en los datos importados del PBIX. Ese alcance no impide revisar las consultas comerciales.

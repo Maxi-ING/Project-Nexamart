@@ -1,5 +1,7 @@
 # Evidencia del proyecto NexaMart
 
+**Evidencia histórica:** estas imágenes corresponden a la versión original, no a las correcciones de calendario y métricas. El proyecto revisado está en [powerbi/README.md](../powerbi/README.md); sus nuevas capturas requieren Desktop.
+
 Las diez imágenes se conservan sin modificar. Los nombres se ordenaron por su propósito para facilitar la revisión.
 
 | Archivo | Evidencia | Captura original |

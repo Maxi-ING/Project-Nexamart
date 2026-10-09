@@ -1,0 +1,54 @@
+// Modelo corregido: mismas definiciones que sql/consultas_analiticas.sql.
+
+Ventas Brutas =
+CALCULATE(SUM('nexamart factventas'[precio_total]), KEEPFILTERS('nexamart factventas'[es_devolucion] = FALSE()))
+
+Importe Devoluciones =
+COALESCE(-CALCULATE(SUM('nexamart factventas'[precio_total]), KEEPFILTERS('nexamart factventas'[es_devolucion] = TRUE())), 0)
+
+Ventas Netas =
+SUM('nexamart factventas'[precio_total])
+
+Pedidos Venta =
+CALCULATE(DISTINCTCOUNT('nexamart factventas'[order_id]), KEEPFILTERS('nexamart factventas'[es_devolucion] = FALSE()))
+
+Total Eventos =
+DISTINCTCOUNT('nexamart factventas'[order_id])
+
+Ticket Promedio =
+DIVIDE([Ventas Brutas], [Pedidos Venta])
+
+Unidades Vendidas =
+CALCULATE(SUM('nexamart factventas'[cantidad]), KEEPFILTERS('nexamart factventas'[es_devolucion] = FALSE()))
+
+Unidades Netas =
+SUM('nexamart factventas'[cantidad])
+
+Total Devoluciones =
+CALCULATE([Total Eventos], KEEPFILTERS('nexamart factventas'[es_devolucion] = TRUE()))
+
+Proporción Eventos Devolución =
+DIVIDE([Total Devoluciones], [Total Eventos])
+
+Ventas Mes Anterior =
+CALCULATE([Ventas Netas], DATEADD(DimCalendario[Date], -1, MONTH))
+
+% Crecimiento MoM =
+IF(NOT ISBLANK([Ventas Netas]) && NOT ISBLANK([Ventas Mes Anterior]), DIVIDE([Ventas Netas] - [Ventas Mes Anterior], [Ventas Mes Anterior]))
+
+Ventas YTD =
+IF(NOT ISBLANK([Ventas Netas]), TOTALYTD([Ventas Netas], DimCalendario[Date]))
+
+Ranking Vendedor =
+VAR IdActual = SELECTEDVALUE('nexamart dimvendedor'[vendedor_id])
+VAR Candidatos = FILTER(ALL('nexamart dimvendedor'[vendedor_id], 'nexamart dimvendedor'[nombre_vendedor]), 'nexamart dimvendedor'[vendedor_id] <> -1)
+RETURN IF(NOT ISBLANK(IdActual) && IdActual <> -1 && NOT ISBLANK([Ventas Netas]), RANKX(Candidatos, CALCULATE([Ventas Netas]), [Ventas Netas], DESC, SKIP))
+
+Ranking Producto en Categoría =
+VAR CategoriaActual = SELECTEDVALUE('nexamart dimproducto'[categoria])
+VAR IdActual = SELECTEDVALUE('nexamart dimproducto'[producto_id])
+VAR ImporteActual = [Ventas Netas]
+VAR Candidatos = FILTER(ALL('nexamart dimproducto'), 'nexamart dimproducto'[categoria] = CategoriaActual)
+VAR Puesto = RANKX(Candidatos, CALCULATE([Ventas Netas]), ImporteActual, DESC, SKIP)
+VAR Desempate = COUNTROWS(FILTER(Candidatos, CALCULATE([Ventas Netas]) = ImporteActual && 'nexamart dimproducto'[producto_id] < IdActual))
+RETURN IF(NOT ISBLANK(IdActual) && NOT ISBLANK(ImporteActual), Puesto + Desempate)

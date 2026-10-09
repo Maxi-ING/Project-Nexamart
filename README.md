@@ -7,11 +7,11 @@ Análisis de ventas de una cadena ficticia con tiendas en **New York, London, Si
 **757 registros · 4 tiendas · 31 productos · 12 meses**  
 Septiembre de 2025 a agosto de 2026. Datos simulados con fines de portafolio.
 
-[Consultas SQL](sql/consultas_analiticas.sql) · [Dashboard Power BI](powerbi/NexaMart.pbix) · [Caso en Notion](https://app.notion.com/p/3f3711ab612481f9a5b6fe8d50bfbdbd)
+[Consultas SQL](sql/consultas_analiticas.sql) · [Power BI: proyecto editable](powerbi/README.md) · [Caso en Notion](https://app.notion.com/p/3f3711ab612481f9a5b6fe8d50bfbdbd)
 
 ## SQL: preguntas de negocio y análisis
 
-El núcleo del proyecto son **siete consultas comerciales** sobre un modelo de ventas en MySQL, acompañadas de una vista consolidada para facilitar su consumo.
+El núcleo del proyecto son **diez consultas comerciales** sobre un modelo de ventas en MySQL, acompañadas de una vista consolidada para facilitar su consumo.
 
 | Pregunta | Técnica SQL |
 |---|---|
@@ -22,35 +22,52 @@ El núcleo del proyecto son **siete consultas comerciales** sobre un modelo de v
 | ¿Cómo evolucionan las ventas y los pedidos por mes? | Agrupación temporal |
 | ¿Qué clientes VIP acumulan mayor gasto? | CTE, segmentación y Top 10 |
 | ¿Qué categorías presentan más devoluciones? | `CASE` y agregación condicional |
+| ¿Concilian bruto, devoluciones, neto y ticket? | Agregación condicional y conteo de compras |
+| ¿Qué explica la brecha entre Singapore y Sydney? | CTEs y descomposición de volumen / ticket |
+| ¿Qué categorías concentran esa brecha? | Agregación condicional y ventanas para participación |
 
 **Ejemplo: ranking global y por tienda.** Una CTE calcula el importe por vendedor; las funciones de ventana permiten compararlo en ambos niveles sin perder el detalle:
 
 ```sql
 SELECT *,
     RANK() OVER (
-        ORDER BY ventas_totales DESC
+        ORDER BY ventas_netas DESC
     ) AS ranking_global,
     RANK() OVER (
-        PARTITION BY nombre_tienda ORDER BY ventas_totales DESC
+        PARTITION BY tienda_id ORDER BY ventas_netas DESC
     ) AS ranking_en_tienda
 FROM ventas_por_vendedor;
 ```
 
 [Ver la consulta completa y las demás preguntas](sql/consultas_analiticas.sql).
 
-![Ranking de vendedores ejecutado en MySQL](capturas/04_ranking_vendedores_sql.png)
+[Ver ejecución original del ranking en MySQL](capturas/04_ranking_vendedores_sql.png). La consulta actual utiliza ventas netas.
 
-Las consultas comerciales excluyen devoluciones: suman **104.718,63** en 751 ventas. Power BI incorpora los seis eventos negativos y muestra **103.851,74 netos**. Los importes son unidades monetarias de simulación.
+**SQL y el modelo corregido de Power BI comparten las mismas definiciones:**
+
+| Indicador | Valor | Regla |
+|---|---:|---|
+| Ventas brutas | 104.718,63 | Eventos de venta |
+| Importe devuelto | 866,89 | Devoluciones, presentado positivo |
+| Ventas netas | 103.851,74 | Brutas − importe devuelto |
+| Compras | 751 | Excluye eventos de devolución |
+| Ticket promedio | 139,44 | Brutas / compras |
+
+Rankings y participaciones se calculan sobre **ventas netas**. Los importes son unidades monetarias de simulación.
 
 ## Dashboard: respuestas y decisiones
 
 ### 1. Resumen ejecutivo — ¿Dónde se concentra el resultado?
 
-**Respuesta:** Singapore lidera con **30.973,16 netos**, frente a **22.282,61** de Sydney. Los indicadores y la comparación por tienda permiten localizar diferencias y explorar su evolución mensual.
+**Respuesta:** Singapore supera a Sydney en **8.690,55 netos**. Tiene 197 compras frente a 177 y un ticket de 159,34 frente a 126,40. La descomposición atribuye **6.160,11 al ticket**, **2.857,39 al volumen** y **−326,95 a la diferencia de devoluciones**.
 
-**Acción sugerida:** comparar el catálogo y la mezcla de ventas de ambas tiendas antes de definir acciones comerciales para Sydney.
+**Acción sugerida:** profundizar Sports & Fitness, que concentra **5.688,99 de la brecha con 37 compras en cada tienda**. Foldable Treadmill registra 20 unidades netas en Singapore frente a 4 en Sydney: revisar surtido, disponibilidad y cantidades por compra antes de plantear acciones comerciales.
 
-![Resumen ejecutivo](capturas/06_resumen_ejecutivo.png)
+[Ver análisis, método y resultados SQL](docs/conclusion_comercial.md).
+
+*Las capturas siguientes documentan el diseño original; los KPIs y el calendario revisados están en el proyecto editable.*
+
+![Resumen ejecutivo original](capturas/06_resumen_ejecutivo.png)
 
 ### 2. Productos y vendedores — ¿Quién y qué impulsa las ventas?
 
@@ -75,8 +92,8 @@ Estas acciones son recomendaciones del caso, no mejoras económicas demostradas.
 Una tabla de hechos y cinco dimensiones sostienen los JOINs y el análisis. En esta versión hay **un producto por pedido**. La preparación en Python normalizó los datos y conservó los registros sin identificación mediante la clave `-1`.
 
 - [Esquema y carga MySQL](sql/) y [datos del informe](data/snapshot/README.md).
-- [Once medidas DAX](powerbi/medidas_originales.dax), [modelo y definiciones](docs/decisiones_tecnicas.md).
+- [15 medidas DAX revisadas](powerbi/medidas_corregidas.dax), [modelo y definiciones](docs/decisiones_tecnicas.md).
 - [Capturas de consultas, dashboard y filtros](capturas/README.md).
 - [Cómo reproducir el análisis](docs/reproduccion.md): MySQL 8.0+, carga, controles y revisión del PBIX.
 
-**Antes de revisar la tendencia, MoM o YTD:** restablecer la relación calendario–ventas y ordenar los meses cronológicamente, según la guía. El repositorio permite reproducir el análisis desde los datos importados del PBIX.
+**Power BI:** [descarga el proyecto PBIP](powerbi/NexaMart_corregido.zip), con relación calendario–ventas, meses ordenados y métricas revisadas. La verificación de estructura y datos está publicada; **abrir, actualizar y guardar el PBIX final en Desktop sigue pendiente**. [Pasos de revisión](powerbi/README.md).

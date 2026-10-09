@@ -1,0 +1,99 @@
+{
+  "alcance_validacion": "SQL interpretado desde MySQL con sqlglot y ejecutado en SQLite; comprobación independiente de datos; esquemas oficiales PBIP/PBIR. No ejecuta MySQL ni el motor DAX/Desktop.",
+  "consultas_validadas": 10,
+  "json_validados_con_esquema_oficial": 28,
+  "visuales_referenciados": 19,
+  "relaciones": 6,
+  "medidas": 15,
+  "metricas": {
+    "ventas_brutas": 104718.63,
+    "importe_devoluciones": 866.89,
+    "ventas_netas": 103851.74,
+    "pedidos_venta": 751,
+    "ticket_promedio": 139.44,
+    "total_eventos": 757,
+    "eventos_devolucion": 6
+  },
+  "comparacion_tiendas": {
+    "pedidos_singapore": 197,
+    "pedidos_sydney": 177,
+    "ticket_singapore": 159.34,
+    "ticket_sydney": 126.4,
+    "brecha_neta": 8690.55,
+    "efecto_volumen": 2857.39,
+    "efecto_ticket": 6160.11,
+    "efecto_devoluciones": -326.95,
+    "volumen_pct_brecha": 32.88,
+    "ticket_pct_brecha": 70.88,
+    "devoluciones_pct_brecha": -3.76,
+    "residual": 0.0
+  },
+  "mezcla_categorias": [
+    {
+      "categoria": "Sports & Fitness",
+      "netas_singapore": 8993.5,
+      "netas_sydney": 3304.51,
+      "contribucion_brecha": 5688.99,
+      "porcentaje_brecha": 65.46,
+      "pedidos_singapore": 37,
+      "pedidos_sydney": 37,
+      "mezcla_singapore_pct": 18.78,
+      "mezcla_sydney_pct": 20.9,
+      "ticket_singapore": 245.55,
+      "ticket_sydney": 89.31
+    },
+    {
+      "categoria": "Smart Home",
+      "netas_singapore": 7574.34,
+      "netas_sydney": 4954.55,
+      "contribucion_brecha": 2619.79,
+      "porcentaje_brecha": 30.15,
+      "pedidos_singapore": 44,
+      "pedidos_sydney": 35,
+      "mezcla_singapore_pct": 22.34,
+      "mezcla_sydney_pct": 19.77,
+      "ticket_singapore": 172.14,
+      "ticket_sydney": 141.56
+    },
+    {
+      "categoria": "Fashion",
+      "netas_singapore": 2894.49,
+      "netas_sydney": 1809.65,
+      "contribucion_brecha": 1084.84,
+      "porcentaje_brecha": 12.48,
+      "pedidos_singapore": 37,
+      "pedidos_sydney": 27,
+      "mezcla_singapore_pct": 18.78,
+      "mezcla_sydney_pct": 15.25,
+      "ticket_singapore": 79.45,
+      "ticket_sydney": 70.36
+    },
+    {
+      "categoria": "Beauty & Personal Care",
+      "netas_singapore": 1491.56,
+      "netas_sydney": 1264.56,
+      "contribucion_brecha": 227.0,
+      "porcentaje_brecha": 2.61,
+      "pedidos_singapore": 25,
+      "pedidos_sydney": 29,
+      "mezcla_singapore_pct": 12.69,
+      "mezcla_sydney_pct": 16.38,
+      "ticket_singapore": 59.66,
+      "ticket_sydney": 43.61
+    },
+    {
+      "categoria": "Electronics",
+      "netas_singapore": 10019.27,
+      "netas_sydney": 10949.34,
+      "contribucion_brecha": -930.07,
+      "porcentaje_brecha": -10.7,
+      "pedidos_singapore": 54,
+      "pedidos_sydney": 49,
+      "mezcla_singapore_pct": 27.41,
+      "mezcla_sydney_pct": 27.68,
+      "ticket_singapore": 190.73,
+      "ticket_sydney": 223.46
+    }
+  ],
+  "pendiente": "Abrir PBIP, actualizar datos y comprobar visuales/DAX en Power BI Desktop; guardar como PBIX. Ejecutar SQL en MySQL 8.0."
+}

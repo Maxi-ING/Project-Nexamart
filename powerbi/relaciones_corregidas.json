@@ -1,0 +1,68 @@
+[
+  {
+    "name": "ventas_tienda_id",
+    "fromTable": "nexamart factventas",
+    "fromColumn": "tienda_id",
+    "toTable": "nexamart dimtienda",
+    "toColumn": "tienda_id",
+    "fromCardinality": "many",
+    "toCardinality": "one",
+    "crossFilteringBehavior": "oneDirection",
+    "isActive": true
+  },
+  {
+    "name": "ventas_vendedor_id",
+    "fromTable": "nexamart factventas",
+    "fromColumn": "vendedor_id",
+    "toTable": "nexamart dimvendedor",
+    "toColumn": "vendedor_id",
+    "fromCardinality": "many",
+    "toCardinality": "one",
+    "crossFilteringBehavior": "oneDirection",
+    "isActive": true
+  },
+  {
+    "name": "ventas_producto_id",
+    "fromTable": "nexamart factventas",
+    "fromColumn": "producto_id",
+    "toTable": "nexamart dimproducto",
+    "toColumn": "producto_id",
+    "fromCardinality": "many",
+    "toCardinality": "one",
+    "crossFilteringBehavior": "oneDirection",
+    "isActive": true
+  },
+  {
+    "name": "ventas_cliente_id",
+    "fromTable": "nexamart factventas",
+    "fromColumn": "cliente_id",
+    "toTable": "nexamart dimcliente",
+    "toColumn": "cliente_id",
+    "fromCardinality": "many",
+    "toCardinality": "one",
+    "crossFilteringBehavior": "oneDirection",
+    "isActive": true
+  },
+  {
+    "name": "ventas_metodo_pago_id",
+    "fromTable": "nexamart factventas",
+    "fromColumn": "metodo_pago_id",
+    "toTable": "nexamart dimmetodopago",
+    "toColumn": "metodo_pago_id",
+    "fromCardinality": "many",
+    "toCardinality": "one",
+    "crossFilteringBehavior": "oneDirection",
+    "isActive": true
+  },
+  {
+    "name": "ventas_calendario",
+    "fromTable": "nexamart factventas",
+    "fromColumn": "fecha",
+    "toTable": "DimCalendario",
+    "toColumn": "Date",
+    "fromCardinality": "many",
+    "toCardinality": "one",
+    "crossFilteringBehavior": "oneDirection",
+    "isActive": true
+  }
+]
