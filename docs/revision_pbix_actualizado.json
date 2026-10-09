@@ -1,0 +1,25 @@
+{
+  "archivo": "powerbi/NexaMart.pbix",
+  "sha256": "da65c199ebb52b6b533a492757b3e84aa6f6271599c955a1b1121ea8084d9acc",
+  "datos_fuente_sin_cambios": true,
+  "filas_hechos": 757,
+  "compras": 751,
+  "devoluciones": 6,
+  "ventas_brutas_centavos": 10471863,
+  "importe_devuelto_centavos": 86689,
+  "ventas_netas_centavos": 10385174,
+  "ticket_esperado": 139.44,
+  "medidas": 14,
+  "dias_calendario": 730,
+  "relaciones_analiticas": 6,
+  "relacion_calendario_presente": true,
+  "relacion_calendario_ya_presente_en_original": true,
+  "nota_extraccion": "Se corrigió un falso negativo: PBIXRay.relationships filtra SystemFlags=0 y omite DimCalendario calculada. Se consultaron las relaciones completas en SQLite.",
+  "evidencia_visual": "Capturas de Desktop aportadas por el autor: neto 103,85 mil, compras 751, ticket 139,44 y devoluciones 6 / 0,79 %.",
+  "observaciones": [
+    "La captura muestra orden mensual cronológico; la definición PBIR aún registra orden por ventas descendente.",
+    "Año-Mes sigue tipado como fecha y sin SortByColumn; revisar tipo Texto y orden por AñoMesOrden para guardar una configuración explícita.",
+    "Las medidas brutas y de importe devuelto existen, pero no se añadieron tarjetas para ellas.",
+    "El ranking original de productos no incluye el desempate por producto_id del SQL."
+  ]
+}

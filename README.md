@@ -7,7 +7,7 @@ Análisis de ventas de una cadena ficticia con tiendas en **New York, London, Si
 **757 registros · 4 tiendas · 31 productos · 12 meses**  
 Septiembre de 2025 a agosto de 2026. Datos simulados con fines de portafolio.
 
-[Consultas SQL](sql/consultas_analiticas.sql) · [Power BI: proyecto editable](powerbi/README.md) · [Caso en Notion](https://app.notion.com/p/3f3711ab612481f9a5b6fe8d50bfbdbd)
+[Consultas SQL](sql/consultas_analiticas.sql) · [Dashboard Power BI](powerbi/NexaMart.pbix) · [Caso en Notion](https://app.notion.com/p/3f3711ab612481f9a5b6fe8d50bfbdbd)
 
 ## SQL: preguntas de negocio y análisis
 
@@ -43,7 +43,7 @@ FROM ventas_por_vendedor;
 
 [Ver ejecución original del ranking en MySQL](capturas/04_ranking_vendedores_sql.png). La consulta actual utiliza ventas netas.
 
-**SQL y el modelo corregido de Power BI comparten las mismas definiciones:**
+**SQL y el PBIX actualizado comparten estas definiciones:**
 
 | Indicador | Valor | Regla |
 |---|---:|---|
@@ -65,9 +65,9 @@ Rankings y participaciones se calculan sobre **ventas netas**. Los importes son 
 
 [Ver análisis, método y resultados SQL](docs/conclusion_comercial.md).
 
-*Las capturas siguientes documentan el diseño original; los KPIs y el calendario revisados están en el proyecto editable.*
+*Capturas actualizadas del informe en Power BI Desktop, aportadas el 9 de octubre de 2026.*
 
-![Resumen ejecutivo original](capturas/06_resumen_ejecutivo.png)
+![Resumen ejecutivo actualizado](capturas/06_resumen_ejecutivo.png)
 
 ### 2. Productos y vendedores — ¿Quién y qué impulsa las ventas?
 
@@ -87,13 +87,31 @@ Rankings y participaciones se calculan sobre **ventas netas**. Los importes son 
 
 Estas acciones son recomendaciones del caso, no mejoras económicas demostradas. Los ingresos no permiten concluir rentabilidad o productividad, y seis devoluciones no bastan para atribuir causas.
 
-## Modelo y revisión técnica
+## De MySQL al modelo de Power BI
 
-Una tabla de hechos y cinco dimensiones sostienen los JOINs y el análisis. En esta versión hay **un producto por pedido**. La preparación en Python normalizó los datos y conservó los registros sin identificación mediante la clave `-1`.
+Las cinco dimensiones y ventas se importan desde MySQL. Las claves foráneas sostienen los JOINs; en Power BI, las relaciones **1:* con filtro único** hacen que las selecciones del dashboard filtren las ventas. `DimCalendario`, creada con DAX, añade la relación por fecha. La tabla `Medidas` organiza las fórmulas y no necesita relaciones.
+
+MySQL conserva la asignación vendedor–tienda; Power BI conecta ambas dimensiones directamente a ventas para evitar caminos de filtro ambiguos. [Ver explicación y correspondencia de los modelos](docs/modelo_mysql_powerbi.md).
+
+<details>
+<summary>Ver diagrama físico de MySQL y relaciones de Power BI</summary>
+
+**MySQL: claves y estructura física**
+
+![Esquema físico de MySQL](capturas/02_diagrama_mysql.png)
+
+**Power BI: dimensiones, calendario y filtros**
+
+![Relaciones de Power BI actualizadas](capturas/10_modelo_powerbi.png)
+
+</details>
+
+Una fila contiene un producto por pedido. La preparación en Python conservó registros sin identificación mediante la clave `-1`.
+
 
 - [Esquema y carga MySQL](sql/) y [datos del informe](data/snapshot/README.md).
-- [15 medidas DAX revisadas](powerbi/medidas_corregidas.dax), [modelo y definiciones](docs/decisiones_tecnicas.md).
+- [14 medidas del PBIX actual](powerbi/medidas_actuales.dax), [modelo y definiciones](docs/decisiones_tecnicas.md).
 - [Capturas de consultas, dashboard y filtros](capturas/README.md).
 - [Cómo reproducir el análisis](docs/reproduccion.md): MySQL 8.0+, carga, controles y revisión del PBIX.
 
-**Power BI:** [descarga el proyecto PBIP](powerbi/NexaMart_corregido.zip), con relación calendario–ventas, meses ordenados y métricas revisadas. La verificación de estructura y datos está publicada; **abrir, actualizar y guardar el PBIX final en Desktop sigue pendiente**. [Pasos de revisión](powerbi/README.md).
+**Informe disponible:** [NexaMart.pbix](powerbi/NexaMart.pbix), con calendario ampliado y ticket corregido. Se revisaron sus datos, fórmulas y capturas. La [guía Power BI](powerbi/README.md) distingue el archivo actual del proyecto editable y recoge los ajustes restantes de configuración.

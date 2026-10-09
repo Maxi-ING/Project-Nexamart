@@ -46,6 +46,37 @@ def literal(value):
     return str(int(value))
 
 
+def full_relationships(model):
+    """Incluye dimensiones calculadas omitidas por el filtro SystemFlags de PBIXRay.
+
+    Usa los metadatos SQLite de la versión fijada en requirements_snapshot.txt.
+    Excluye solo las tablas automáticas de fecha, no DimCalendario.
+    """
+    source = model._metadata.source
+    if not hasattr(source, '_db') or not hasattr(source, '_rel_col'):
+        raise RuntimeError('Se requiere el lector SQLite de PBIXRay 0.15.5 para revisar todas las relaciones.')
+    names = {name: source._rel_col(name) for name in (
+        'FromTableID', 'FromColumnID', 'ToTableID', 'ToColumnID',
+        'FromCardinality', 'ToCardinality')}
+    query = f"""
+    SELECT ft.Name AS FromTableName, COALESCE(fc.ExplicitName, fc.InferredName) AS FromColumnName,
+           tt.Name AS ToTableName, COALESCE(tc.ExplicitName, tc.InferredName) AS ToColumnName,
+           r.IsActive,
+           CASE WHEN r.{names['FromCardinality']} = 2 THEN 'M' ELSE '1' END || ':' ||
+           CASE WHEN r.{names['ToCardinality']} = 2 THEN 'M' ELSE '1' END AS Cardinality,
+           CASE WHEN r.CrossFilteringBehavior = 1 THEN 'Single'
+                WHEN r.CrossFilteringBehavior = 2 THEN 'Both' ELSE 'Other' END AS CrossFilteringBehavior
+    FROM Relationship r
+    JOIN [Table] ft ON r.{names['FromTableID']} = ft.ID
+    JOIN [Column] fc ON r.{names['FromColumnID']} = fc.ID
+    JOIN [Table] tt ON r.{names['ToTableID']} = tt.ID
+    JOIN [Column] tc ON r.{names['ToColumnID']} = tc.ID
+    """
+    frame = source._db.query(query)
+    automatic = frame.FromTableName.str.startswith(('LocalDateTable_', 'DateTableTemplate_')) | frame.ToTableName.str.startswith(('LocalDateTable_', 'DateTableTemplate_'))
+    return frame.loc[~automatic].reset_index(drop=True)
+
+
 def export(pbix, destination):
     model = PBIXRay(str(pbix))
     snapshots = destination / "data" / "snapshot"
@@ -102,7 +133,7 @@ def export(pbix, destination):
     (powerbi / "medidas_originales.dax").write_text("\n".join(dax), encoding="utf-8")
     calendar_expression = model.dax_tables.loc[model.dax_tables.TableName == "DimCalendario", "Expression"].iloc[0]
     (powerbi / "calendario_original.dax").write_text("// Expresión original extraída del PBIX.\nDimCalendario =\n" + calendar_expression.strip() + "\n", encoding="utf-8")
-    relationships = model.relationships[["FromTableName", "FromColumnName", "ToTableName", "ToColumnName", "IsActive", "Cardinality", "CrossFilteringBehavior"]]
+    relationships = full_relationships(model)
     (powerbi / "relaciones_originales.json").write_text(relationships.to_json(orient="records", force_ascii=False, indent=2) + "\n", encoding="utf-8")
     with zipfile.ZipFile(pbix) as archive:
         theme_files = [name for name in archive.namelist() if "RegisteredResources/" in name and name.endswith(".json")]

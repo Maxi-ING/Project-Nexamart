@@ -1,43 +1,45 @@
-# Power BI: versión corregida del proyecto
+# Power BI: informe actual y modelo editable
 
-La versión editable está en [NexaMart_corregido](NexaMart_corregido/) y se descarga completa en [NexaMart_corregido.zip](NexaMart_corregido.zip). Incluye las tres páginas del informe original, su tema y un modelo corregido con **15 medidas y seis relaciones activas**.
+El archivo principal es [NexaMart.pbix](NexaMart.pbix), actualizado por el autor y acompañado de nuevas capturas del 9 de octubre de 2026. Contiene **14 medidas**, calendario de **730 días** y **seis relaciones analíticas activas**, todas con filtro único hacia ventas.
 
-Se corrigieron las definiciones del calendario, el orden mensual y las métricas en los archivos del proyecto. **Pendiente de validación en Power BI Desktop:** abrir, actualizar, comprobar el informe y guardarlo como PBIX. Este entorno no ejecuta Desktop ni el motor DAX. El [PBIX original](NexaMart.pbix) sigue disponible como evidencia histórica y conserva sus limitaciones; no es el archivo corregido.
+Se comprobó que las seis tablas de origen conservan exactamente los mismos datos que la versión anterior. La captura del resumen muestra neto **103,85 mil**, **751 compras** y ticket **139,44**. Las fórmulas de bruto e importe devuelto también están incorporadas, aunque no tienen tarjetas propias.
 
-## Cambios incorporados
+[Medidas actuales](medidas_actuales.dax) · [Relaciones actuales](relaciones_actuales.json) · [Calendario actual](calendario_actual.dax) · [Revisión del archivo](../docs/revision_pbix_actualizado.json)
 
-- Calendario con años completos 2025–2026, clave de fecha y relación activa 1:* a ventas, con filtro desde calendario.
-- Año-Mes de tipo texto, ordenado por AñoMesOrden; tendencia ascendente por mes.
-- Ventas Brutas, Importe Devoluciones y Ventas Netas separados en los KPIs.
-- Pedidos Venta excluye devoluciones. Ticket Promedio = Ventas Brutas / Pedidos Venta: **139,44**, sobre **751 compras**.
-- Rankings y participación de pagos calculados sobre ventas netas, igual que SQL.
-- Proporción Eventos Devolución = eventos de devolución / todos los eventos: **6 / 757 = 0,79 %**.
-- Top 3 por categoría con desempate por producto_id, consistente con ROW_NUMBER.
-- Comparación de tiendas enriquecida con tooltip de compras, ticket, bruto y devoluciones.
+## Correspondencia MySQL–Power BI
 
-## Abrir y guardar
+Las claves del esquema físico se convierten en relaciones de filtro entre dimensiones y hechos. Power BI añade calendario y medidas. La FK vendedor–tienda se conserva en MySQL, pero no se replica como un camino adicional de filtro en el informe.
 
-1. Descarga y descomprime el ZIP; conserva todas sus carpetas juntas.
-2. En Power BI Desktop con soporte PBIP/PBIR, abre `NexaMart_corregido/NexaMart.pbip`. Si tu versión solicita habilitar las opciones de proyecto/informe, actívalas y reinicia Desktop.
-3. Pulsa **Actualizar**. El modo predeterminado `Snapshot` incorpora los mismos datos recuperados del informe, sin rutas locales ni credenciales. La primera apertura no incluye caché de datos.
-4. Comprueba los cinco KPIs: **104.718,63 bruto; 866,89 devuelto; 103.851,74 neto; 751 compras; ticket 139,44**.
-5. Selecciona un mes: la tendencia debe seguir septiembre de 2025–agosto de 2026, la suma debe conciliar y las medidas temporales deben responder al filtro. Comprueba también el Top 3 y los filtros por categoría.
-6. Usa **Guardar como → PBIX** para generar `NexaMart_corregido.pbix`. Ese guardado final y las capturas actualizadas todavía requieren Desktop.
+[Ver ambos diagramas y la explicación](../docs/modelo_mysql_powerbi.md).
 
-## Usar MySQL como origen
+**Corrección de la revisión anterior:** calendario–ventas ya existía en el PBIX inicial. El lector empleado ocultaba relaciones con tablas calculadas. Se consultaron los metadatos completos y se corrigieron el extractor y la documentación.
 
-Restaura el esquema y la carga del repositorio en MySQL. En **Transformar datos → Administrar parámetros**, cambia `pModo` a `MySQL`, ajusta `pServidor` y `pBase`, y configura el conector y las credenciales localmente. Las seis particiones importan las tablas base directamente con MySQL.Database; las medidas y relaciones son las mismas en ambos modos.
+## Ajustes de configuración restantes en el PBIX
 
-El modo Snapshot facilita revisar el caso; MySQL mantiene la arquitectura principal del proyecto. No se incluyen credenciales. El calendario más amplio no añade ventas: YTD de 2025 solo tiene datos desde septiembre y no hay histórico suficiente para YoY completo.
+La captura muestra la tendencia cronológica. Sin embargo, el archivo guarda Año-Mes como fecha, sin SortByColumn, y un criterio PBIR de orden por ventas descendente. Para dejar la configuración explícita:
 
-## Verificación reproducible
+1. Cambia DimCalendario[Año-Mes] a Texto.
+2. Usa Ordenar por columna → AñoMesOrden.
+3. En el gráfico, selecciona ordenar por Año-Mes, ascendente, y guarda.
+4. Comprueba la marca de tabla de fechas usando Date. Los metadatos extraídos no permiten dar por completada esa marca.
+
+El Top 3 DAX actual conserva RANKX sin desempate por identificador; los datos mostrados no presentan empates en sus primeros puestos. Para igualar ROW_NUMBER ante futuros empates, usa la versión de ranking del proyecto editable. Unidades Vendidas mantiene la suma firmada: representa unidades netas (1.026).
+
+Como mejora de presentación, cambia Total Pedidos a Pedidos de venta en el título de la tarjeta y Tasa de devolución a Proporción de eventos de devolución. Bruto e importe devuelto pueden mostrarse en tooltip para conservar tres KPIs principales.
+
+## Proyecto editable alternativo
+
+[NexaMart_corregido.zip](NexaMart_corregido.zip) contiene una versión PBIP con **15 medidas**, calendario marcado, orden mensual explícito y desempate de productos. Es una propuesta editable verificada estructuralmente; no es el archivo que generó las capturas nuevas. Su ejecución en Desktop sigue pendiente.
+
+Descomprime, abre NexaMart.pbip y pulsa Actualizar. El modo Snapshot incorpora los datos; para MySQL cambia pModo, pServidor y pBase, y configura el conector y tus credenciales localmente. Después de comprobar el informe, guarda como PBIX.
+
+El [PBIX inicial](historico/NexaMart_original.pbix) y sus fórmulas originales se conservan para trazabilidad. El calendario ampliado no añade ventas anteriores a septiembre de 2025.
+
+## Revisión reproducible
 
 ```bash
 python -m pip install -r requirements_verificacion.txt
-python scripts/construir_powerbi_corregido.py
 python scripts/verificar_correcciones.py
 ```
 
-Ejecuta estos comandos desde la raíz del repositorio. La verificación revisa referencias de visuales, relaciones, datos incorporados, esquemas JSON oficiales, consultas adaptadas a SQLite e identidades comerciales. No certifica ejecución DAX/Desktop o MySQL.
-
-Documentación del formato: [proyectos PBIP](https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-overview) · [modelo semántico](https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-dataset).
+El verificador comprueba el PBIP alternativo, las consultas adaptadas a SQLite y las identidades comerciales. La revisión del PBIX actual se documenta por separado; este entorno no ejecuta DAX ni Desktop. La ejecución SQL nativa requiere MySQL 8.0.

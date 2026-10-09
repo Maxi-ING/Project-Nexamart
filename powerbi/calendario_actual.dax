@@ -1,0 +1,11 @@
+DimCalendario =
+ADDCOLUMNS(
+    CALENDAR(DATE(2025, 1, 1), DATE(2026, 12, 31)),
+    "Año", YEAR([Date]),
+    "Mes Número", MONTH([Date]),
+    "Mes Nombre", FORMAT([Date], "MMMM"),
+    "Año-Mes", FORMAT([Date], "yyyy-MM"),
+    "AñoMesOrden", YEAR([Date]) * 100 + MONTH([Date]),
+    "Trimestre", "Q" & FORMAT([Date], "Q"),
+    "Día Semana", FORMAT([Date], "dddd")
+)

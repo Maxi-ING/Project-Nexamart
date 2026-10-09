@@ -1,12 +1,12 @@
 # NexaMart | Revisar y reproducir el análisis
 
-## Power BI revisado
+## Power BI actualizado
 
-Descarga [NexaMart_corregido.zip](../powerbi/NexaMart_corregido.zip), descomprímelo y abre NexaMart.pbip en Desktop. Pulsa Actualizar para cargar el snapshot incorporado; comprueba los cinco KPIs y los filtros antes de guardar como PBIX. El calendario y el orden mensual ya están definidos en el proyecto.
+Descarga [NexaMart.pbix](../powerbi/NexaMart.pbix) y ábrelo en Desktop. El autor aportó este archivo guardado y las capturas actualizadas. Los resultados esperados son bruto 104.718,63; devuelto 866,89; neto 103.851,74; 751 compras; ticket 139,44.
 
-Resultados esperados: bruto 104.718,63; importe devuelto 866,89; neto 103.851,74; 751 compras; ticket 139,44. Los pasos completos y la conexión MySQL están en [powerbi/README.md](../powerbi/README.md).
+La relación calendario–ventas está activa y el calendario tiene 730 días. Sigue los ajustes restantes de Año-Mes, orden y marca de fechas descritos en [powerbi/README.md](../powerbi/README.md). Para actualizar desde MySQL, ajusta las seis consultas originales a tu servidor y tus credenciales.
 
-**Pendiente:** apertura y ejecución DAX/Desktop, captura del informe actualizado y guardado final como PBIX. El PBIX original sigue disponible como evidencia, sin estas correcciones.
+El PBIP alternativo es una propuesta editable con configuración explícita y no corresponde a las nuevas capturas; su apertura y ejecución en Desktop siguen pendientes. El PBIX inicial se conserva en powerbi/historico.
 
 ## Restaurar los datos en MySQL 8.0+
 
@@ -31,4 +31,4 @@ python scripts/verificar_correcciones.py
 
 La verificación interpreta SQL MySQL con sqlglot, lo adapta a SQLite y compara los resultados con los CSV. Comprueba relaciones, referencias de visuales, datos portátiles, orden mensual, esquemas JSON oficiales e integridad ZIP. No ejecuta el motor DAX ni MySQL.
 
-Los resultados están en data/resultados y el registro en docs/validacion_correcciones.json. Para reproducir el origen recuperado utiliza scripts/exportar_snapshot_pbix.py con requirements_snapshot.txt; conserva sin cambios el PBIX original y su manifiesto.
+Los resultados están en data/resultados y el registro en docs/validacion_correcciones.json. Para reproducir el origen recuperado utiliza scripts/exportar_snapshot_pbix.py con requirements_snapshot.txt; conserva el PBIX inicial en powerbi/historico y su manifiesto.

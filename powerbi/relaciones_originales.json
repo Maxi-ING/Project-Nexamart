@@ -43,5 +43,14 @@
     "IsActive":1,
     "Cardinality":"M:1",
     "CrossFilteringBehavior":"Single"
+  },
+  {
+    "FromTableName":"nexamart factventas",
+    "FromColumnName":"fecha",
+    "ToTableName":"DimCalendario",
+    "ToColumnName":"Date",
+    "IsActive":1,
+    "Cardinality":"M:1",
+    "CrossFilteringBehavior":"Single"
   }
 ]

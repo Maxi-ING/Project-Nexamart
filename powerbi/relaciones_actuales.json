@@ -1,0 +1,56 @@
+[
+  {
+    "FromTableName":"nexamart factventas",
+    "FromColumnName":"cliente_id",
+    "ToTableName":"nexamart dimcliente",
+    "ToColumnName":"cliente_id",
+    "IsActive":1,
+    "Cardinality":"M:1",
+    "CrossFilteringBehavior":"Single"
+  },
+  {
+    "FromTableName":"nexamart factventas",
+    "FromColumnName":"metodo_pago_id",
+    "ToTableName":"nexamart dimmetodopago",
+    "ToColumnName":"metodo_pago_id",
+    "IsActive":1,
+    "Cardinality":"M:1",
+    "CrossFilteringBehavior":"Single"
+  },
+  {
+    "FromTableName":"nexamart factventas",
+    "FromColumnName":"tienda_id",
+    "ToTableName":"nexamart dimtienda",
+    "ToColumnName":"tienda_id",
+    "IsActive":1,
+    "Cardinality":"M:1",
+    "CrossFilteringBehavior":"Single"
+  },
+  {
+    "FromTableName":"nexamart factventas",
+    "FromColumnName":"producto_id",
+    "ToTableName":"nexamart dimproducto",
+    "ToColumnName":"producto_id",
+    "IsActive":1,
+    "Cardinality":"M:1",
+    "CrossFilteringBehavior":"Single"
+  },
+  {
+    "FromTableName":"nexamart factventas",
+    "FromColumnName":"vendedor_id",
+    "ToTableName":"nexamart dimvendedor",
+    "ToColumnName":"vendedor_id",
+    "IsActive":1,
+    "Cardinality":"M:1",
+    "CrossFilteringBehavior":"Single"
+  },
+  {
+    "FromTableName":"nexamart factventas",
+    "FromColumnName":"fecha",
+    "ToTableName":"DimCalendario",
+    "ToColumnName":"Date",
+    "IsActive":1,
+    "Cardinality":"M:1",
+    "CrossFilteringBehavior":"Single"
+  }
+]

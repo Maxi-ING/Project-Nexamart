@@ -1,0 +1,61 @@
+// Fórmulas extraídas del PBIX actualizado aportado el 9 de octubre de 2026.
+
+Ventas Totales =
+SUM('nexamart factventas'[precio_total])
+
+Unidades Vendidas =
+SUM('nexamart factventas'[cantidad])
+
+Total Pedidos =
+CALCULATE(
+    DISTINCTCOUNT('nexamart factventas'[order_id]),
+    'nexamart factventas'[es_devolucion] = FALSE()
+)
+
+Ticket Promedio =
+DIVIDE([Ventas Brutas], [Total Pedidos])
+
+Ventas Mes Anterior =
+CALCULATE([Ventas Totales], DATEADD(DimCalendario[Date], -1, MONTH))
+
+% Crecimiento MoM =
+DIVIDE([Ventas Totales] - [Ventas Mes Anterior], [Ventas Mes Anterior])
+
+Ventas YTD =
+TOTALYTD([Ventas Totales], DimCalendario[Date])
+
+Ranking Vendedor =
+RANKX(ALL('nexamart dimvendedor'[nombre_vendedor]), [Ventas Totales], , DESC)
+
+Total Devoluciones =
+CALCULATE(
+    [Total Eventos],
+    'nexamart factventas'[es_devolucion] = TRUE()
+)
+
+% Tasa Devolución =
+DIVIDE([Total Devoluciones], [Total Eventos])
+
+Ranking Producto en Categoría =
+RANKX(
+    ALLEXCEPT('nexamart dimproducto', 'nexamart dimproducto'[categoria]),
+    [Ventas Totales], , DESC
+)
+
+Ventas Brutas =
+CALCULATE(
+    SUM('nexamart factventas'[precio_total]),
+    'nexamart factventas'[es_devolucion] = FALSE()
+)
+
+Importe Devoluciones =
+COALESCE(
+    -CALCULATE(
+        SUM('nexamart factventas'[precio_total]),
+        'nexamart factventas'[es_devolucion] = TRUE()
+    ),
+    0
+)
+
+Total Eventos =
+DISTINCTCOUNT('nexamart factventas'[order_id])

@@ -1,6 +1,6 @@
 {
   "origen": "Datos y metadatos recuperados del PBIX aportado por el autor",
-  "archivo": "powerbi/NexaMart.pbix",
+  "archivo": "powerbi/historico/NexaMart_original.pbix",
   "sha256_pbix": "3dfd06c161713a685390137c5893d811e191adc0a5779f4a5e9ff721340de292",
   "lector": "pbixray 0.15.5",
   "filas_por_tabla": {
@@ -13,8 +13,8 @@
   },
   "filas_calendario": 365,
   "medidas_dax": 11,
-  "relaciones_base_recuperadas": 5,
-  "relacion_calendario_hechos_presente": false,
+  "relaciones_base_recuperadas": 6,
+  "relacion_calendario_hechos_presente": true,
   "metricas": {
     "registros": 757,
     "order_id_distintos": 757,
@@ -35,5 +35,6 @@
     "precio_por_cantidad": true,
     "devoluciones_por_signo": true,
     "conciliacion_importes": true
-  }
+  },
+  "nota_revision_relaciones": "Se corrigió un falso negativo: PBIXRay.relationships filtra SystemFlags=0 y omite DimCalendario calculada. Se consultaron las relaciones completas en SQLite."
 }
